@@ -1,0 +1,4 @@
+- it require to receive global key binding
+- it require to receive audio input from the microphone
+- check if the permissions are granted for both of these
+  - else ask for it

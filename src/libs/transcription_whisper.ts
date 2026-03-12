@@ -1,3 +1,6 @@
+// node import
+import Path from 'path';
+
 // npm import
 import { downloadWhisperModel, installWhisperCpp, transcribe, toCaptions, Language } from '@remotion/install-whisper-cpp';
 
@@ -97,4 +100,23 @@ export class TranscriptionWhisper {
 			printOutput: verbose ? true : false,
 		});
 	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// minitest — runs only when executed directly
+///////////////////////////////////////////////////////////////////////////////
+if (require.main === module) {
+	(async () => {
+		console.log('TranscriptionWhisper minitest — transcribing a test file…');
+		const testAudioPath = `${__dirname}/../../test_assets/test_sound.wav`;
+		const whisperPath = Path.resolve(__dirname, '../../outputs/whisper.cpp');
+
+		const transcription = await TranscriptionWhisper.transcribe(whisperPath, testAudioPath, {
+			verbose: true,
+			modelName: 'medium.en',
+		});
+		console.log('Transcription result:', transcription);
+		console.log('minitest passed ✓');
+	})();
 }

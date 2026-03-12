@@ -13,3 +13,17 @@ export class KeyTypingHelper {
 		// }
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// minitest — runs only when executed directly
+///////////////////////////////////////////////////////////////////////////////
+if (require.main === module) {
+	(async () => {
+		console.log('KeyTypingHelper minitest — typing a test string…');
+		const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+		console.log('Waiting 5 seconds before typing the test string. Please focus the desired input field...');
+		await sleepAsync(5000);
+		await KeyTypingHelper.typeString("Hello, world!");
+		console.log('minitest passed ✓');
+	})();
+}

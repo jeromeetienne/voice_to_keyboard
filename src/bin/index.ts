@@ -10,6 +10,8 @@ import { IOBindingHelper, IOBindingCallback } from '../libs/iobinding_helper';
 import { MicRecorder } from '../libs/mic_recorder';
 import { KeyTypingHelper } from '../libs/key_typing_helper';
 
+type AppState = 'idle' | 'recording' | 'processing';
+
 async function main() {
 	const verbose = false
 	// install whisper.cpp if needed
@@ -20,23 +22,33 @@ async function main() {
 	});
 
 	const recorder = new MicRecorder({ verbose: true });
-	let state: 'idle' | 'recording' | 'processing' = 'idle';
+	let appState: AppState = 'idle';
 	const onStart: IOBindingCallback = () => {
-		console.log('start recording')
-
-		if (state !== 'idle') {
+		// switch from 'idle' to 'recording' state. 
+		// - If we're not in 'idle' state, ignore the event (could be a duplicate event or something else unexpected)
+		if (appState !== 'idle') {
 			console.warn('Received start event while not in idle state. Ignoring.');
 			return;
 		}
-		state = 'recording';
+		Assert.ok(appState === 'idle', 'Received start event while not in idle state');
+		appState = 'recording';
+
+		console.log('start recording')
 		recorder.startRecording();
 	}
 	const onStop: IOBindingCallback = () => {
-		console.log('stop recording');
+		// switch from 'recording' to 'processing' state. 
+		// - If we're not in 'recording' state, ignore the event (could be a duplicate event or something else unexpected)
+		if (appState !== 'recording') {
+			console.warn('Received stop event while not in recording state. Ignoring.');
+			return;
+		}
+		Assert.ok(appState === 'recording', 'Received stop event while not in recording state');
+		appState = 'processing';
+
 		(async () => {
+			console.log('stop recording');
 			const soundBuffer = await recorder.stopRecording();
-			Assert.ok(state === 'recording', 'Received stop event while not in recording state');
-			state = 'processing';
 
 			// Save the recorded audio to a file
 			const soundPath = Path.join(Os.tmpdir(), `sound-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`);
@@ -60,7 +72,7 @@ async function main() {
 			// Type the transcribed text using robotjs
 			await KeyTypingHelper.typeString(transcriptionText);
 
-			state = 'idle';
+			appState = 'idle';
 		})().catch((err) => {
 			console.error('Error in onStop handler:', err);
 		});

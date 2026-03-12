@@ -19,6 +19,9 @@ export class MicRecorder {
 	startRecording(): void {
 		if (this.child !== null) throw new Error('Already recording');
 
+		// Use the 'rec' command line tool from SoX to record audio from the microphone.
+		// - `brew install sox` to get the `rec` command line tool on macOS. On Linux, it should be available in the package manager.
+		// - `rec -r 16000 -c 1 -b 16 -e signed-integer output.wav` to record a 16kHz mono 16-bit signed integer WAV file, which is the optimal format for whisper.cpp
 		const child_cmd = 'rec';
 		const child_args = ['-r', '16000', '-c', '1', '-b', '16', '-e', 'signed-integer', this.soundPath];
 
