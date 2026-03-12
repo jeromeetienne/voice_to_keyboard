@@ -1,0 +1,37 @@
+{
+    // format on save
+    "editor.formatOnSave": true,
+    // disable auto-detection of indentation to ensure consistent formatting
+    "editor.detectIndentation": false,
+    // indent with tabs and set tab size to 8
+    "[typescript]": {
+        "editor.insertSpaces": false,
+        "editor.tabSize": 8
+    },
+    "[typescriptreact]": {
+        "editor.insertSpaces": false,
+        "editor.tabSize": 8
+    },
+    "[JSON]": {
+        "editor.insertSpaces": false,
+        "editor.tabSize": 8
+    },
+    // enable word wrap for all files
+    "editor.wordWrap": "on",
+    // Trying to make typescript server more performant by excluding large folders
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/.git/**": true,
+        "**/generated/**": true
+    },
+    // Trying to make typescript server more performant by increasing memory limit
+    "typescript.tsserver.maxMemory": 4096,
+    "typescript.tsserver.log": "verbose",
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    "eslint.enable": false,
+}

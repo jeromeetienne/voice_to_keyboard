@@ -1,0 +1,29 @@
+{
+    "name": "voice_to_keyboard",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "tsx ./src/bin/index.ts",
+        "typecheck": "tsc --build --noEmit",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jeromeetienne/voice_to_keyboard.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/jeromeetienne/voice_to_keyboard/issues"
+    },
+    "homepage": "https://github.com/jeromeetienne/voice_to_keyboard#readme",
+    "dependencies": {
+        "@remotion/install-whisper-cpp": "4.0.435",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
+        "zod": "^4.3.6"
+    }
+}
