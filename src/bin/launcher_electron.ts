@@ -1,8 +1,5 @@
 // node imports
 import Path from 'node:path';
-import Fs from 'node:fs';
-import Os from 'node:os';
-import Assert from 'node:assert';
 
 // local imports
 import Electron from "electron";
@@ -27,13 +24,13 @@ Electron.app.whenReady().then(async () => {
 
 
 	// initialize the tray icon with the idle icon
-	const tray = new Electron.Tray(imageNativeIdle);
+	const trayMenu = new Electron.Tray(imageNativeIdle);
 
 
-	const menu = Electron.Menu.buildFromTemplate([
+	const dropDownMenu = Electron.Menu.buildFromTemplate([
 		{
 			role: "about",
-			// click
+			label: "About VoiceToKeyboard"
 		},
 		{
 			label: "Github",
@@ -46,8 +43,8 @@ Electron.app.whenReady().then(async () => {
 		{ type: "separator" },
 		{ role: "quit", label: "Quit VoiceToKeyboard" }
 	]);
-	tray.setContextMenu(menu);
-	tray.setToolTip("Voice to Keyboard");
+	trayMenu.setContextMenu(dropDownMenu);
+	trayMenu.setToolTip("Voice to Keyboard");
 
 	const notification = new Electron.Notification({
 		title: "Recording started",
@@ -61,17 +58,18 @@ Electron.app.whenReady().then(async () => {
 	 */
 	const appCallback: Voice2KeyAppCallback = async (appState) => {
 		if (appState === 'idle') {
-			tray.setImage(imageNativeIdle);
+			trayMenu.setImage(imageNativeIdle);
 		} else if (appState === 'recording') {
 			notification.show();
-			tray.setImage(imageNativeRecording);
+			trayMenu.setImage(imageNativeRecording);
 		} else if (appState === 'processing') {
-			tray.setImage(imageNativeProcessing);
+			trayMenu.setImage(imageNativeProcessing);
 		} else {
 			console.warn(`Unknown appState ${appState} in appCallback`);
 			throw new Error(`Unknown appState ${appState} in appCallback`);
 		}
 	}
 
+	// start the app
 	await Voice2KeyApp.main(appCallback);
 });
