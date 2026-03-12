@@ -2,7 +2,6 @@
 import Path from 'node:path';
 import Fs from 'node:fs';
 import Os from 'node:os';
-import Assert from 'node:assert';
 
 // local imports
 import { TranscriptionWhisper } from '../libs/transcription_whisper';
@@ -23,12 +22,25 @@ export type Voice2KeyAppCallback = (appState: AppState) => Promise<void>;
 export class Voice2KeyApp {
 	static async main(onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
 		const verbose = false
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		//	Install whisper if needed
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+
 		// install whisper.cpp if needed
 		const whisperPath = Path.resolve(__dirname, '../../outputs/whisper.cpp');
 		await TranscriptionWhisper.installIfNeeded(whisperPath, {
 			verbose: verbose,
 			modelName: 'medium.en',
 		});
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		//	Initialize MicRecorder
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
 
 		// Start the microphone recorder
 		const recorder = new MicRecorder({ verbose: true });
@@ -48,7 +60,6 @@ export class Voice2KeyApp {
 				console.warn('Received start event while not in idle state. Ignoring.');
 				return;
 			}
-			Assert.ok(appState === 'idle', 'Received start event while not in idle state');
 			appState = 'recording';
 
 			// process event with an async IIFE so we can use await
@@ -68,7 +79,6 @@ export class Voice2KeyApp {
 				console.warn('Received stop event while not in recording state. Ignoring.');
 				return;
 			}
-			Assert.ok(appState === 'recording', 'Received stop event while not in recording state');
 			appState = 'processing';
 
 			// process event with an async IIFE so we can use await

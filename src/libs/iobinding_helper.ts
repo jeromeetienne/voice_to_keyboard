@@ -75,6 +75,31 @@ export class IOBindingHelper {
 	async stop() {
 		iohook.stopMonitoring();
 	}
+
+	/**
+	 * Checks if the application has the necessary accessibility permissions to monitor keyboard events.
+	 * This is required on macOS for iohook to function properly. The function returns a boolean indicating 
+	 * whether the permissions are granted or not.
+	 */
+	static async checkPermissions(): Promise<boolean> {
+		const result = iohook.checkAccessibilityPermissions()
+		const hasPermissions = result.hasPermissions
+		return hasPermissions;
+	}
+
+	/**
+	 * Requests accessibility permissions from the user. This will trigger a system prompt 
+	 * asking the user to grant permissions. The function returns a boolean indicating whether the 
+	 * permissions were granted or not.
+	 * 
+	 * @returns {Promise<boolean>} - A promise that resolves to true if permissions were granted, or false if 
+	 * they were denied.
+	 */
+	static async requestPermissions(): Promise<boolean> {
+		const result = iohook.requestAccessibilityPermissions()
+		const hasPermissions = result.hasPermissions
+		return hasPermissions;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

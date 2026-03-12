@@ -4,6 +4,7 @@ import Path from 'node:path';
 // local imports
 import Electron from "electron";
 import { Voice2KeyApp, Voice2KeyAppCallback } from '../app/voice2key_app';
+import { IOBindingHelper } from '../libs/iobinding_helper';
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,6 +27,11 @@ Electron.app.whenReady().then(async () => {
 	// initialize the tray icon with the idle icon
 	const trayMenu = new Electron.Tray(imageNativeIdle);
 
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	//	Init the dropDown menu
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
 
 	const dropDownMenu = Electron.Menu.buildFromTemplate([
 		{
@@ -46,10 +52,36 @@ Electron.app.whenReady().then(async () => {
 	trayMenu.setContextMenu(dropDownMenu);
 	trayMenu.setToolTip("Voice to Keyboard");
 
-	const notification = new Electron.Notification({
-		title: "Recording started",
-		body: "Press the hotkey again to stop recording"
-	});
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	//	Check & request permissions
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	// Check & request Accessibility permission
+	const hasKeyboardPermissions = await IOBindingHelper.checkPermissions()
+	if (hasKeyboardPermissions === false) {
+		const hasPermissionsNow = await IOBindingHelper.requestPermissions()
+		if (hasPermissionsNow === false) {
+			console.error('Accessibility permission not granted. Key monitoring will not work.')
+			// Optionally show a dialog and quit
+			process.exit(1);
+		}
+	}
+
+	// Check & request Microphone permission
+	const hasMicrophonePermissions = await Electron.systemPreferences.askForMediaAccess('microphone')
+	if (hasMicrophonePermissions === false) {
+		console.error('Microphone permission not granted. Recording will not work.')
+		// Optionally show a dialog and quit
+		process.exit(1);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	//	Initialise and start the app
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Callback function that gets called whenever the app state changes. This is where we can update the tray icon 
@@ -60,7 +92,6 @@ Electron.app.whenReady().then(async () => {
 		if (appState === 'idle') {
 			trayMenu.setImage(imageNativeIdle);
 		} else if (appState === 'recording') {
-			notification.show();
 			trayMenu.setImage(imageNativeRecording);
 		} else if (appState === 'processing') {
 			trayMenu.setImage(imageNativeProcessing);
@@ -69,6 +100,7 @@ Electron.app.whenReady().then(async () => {
 			throw new Error(`Unknown appState ${appState} in appCallback`);
 		}
 	}
+
 
 	// start the app
 	await Voice2KeyApp.main(appCallback);
