@@ -4,7 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "tsx ./src/bin/index.ts",
+        "dev:electron": "NODE_OPTIONS=\"--import tsx\" npx electron ./src/bin/launcher_electron.ts ",
+        "dev:terminal": "tsx ./src/bin/launcher_terminal.ts",
         "typecheck": "tsc --build --noEmit",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -22,6 +23,7 @@
     "homepage": "https://github.com/jeromeetienne/voice_to_keyboard#readme",
     "dependencies": {
         "@remotion/install-whisper-cpp": "4.0.435",
+        "electron": "^41.0.1",
         "iohook-macos": "^1.2.1",
         "robotjs": "^0.7.0",
         "tsx": "^4.21.0",
