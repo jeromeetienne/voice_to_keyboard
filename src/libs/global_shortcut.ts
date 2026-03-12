@@ -11,20 +11,20 @@ import type { EventData, AccessibilityPermissionsResult, EventFilterOptions } fr
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-export type IOBindingCallback = () => void;
+export type GlobalShortcutCallback = () => void;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//	class IOBindingHelper
+//	class GlobalShortcut
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-export class IOBindingHelper {
-	private _onStart: IOBindingCallback;
-	private _onStop: IOBindingCallback;
+export class GlobalShortcut {
+	private _onStart: GlobalShortcutCallback;
+	private _onStop: GlobalShortcutCallback;
 	private _isRunning: boolean;
 
-	constructor(onStart: IOBindingCallback, onStop: IOBindingCallback) {
+	constructor(onStart: GlobalShortcutCallback, onStop: GlobalShortcutCallback) {
 		this._onStart = onStart;
 		this._onStop = onStop;
 		this._isRunning = false;
@@ -109,13 +109,13 @@ export class IOBindingHelper {
 ///////////////////////////////////////////////////////////////////////////////
 
 if (require.main === module) {
-	const onStart: IOBindingCallback = () => {
+	const onStart: GlobalShortcutCallback = () => {
 		console.log('start recording')
 	}
-	const onStop: IOBindingCallback = () => {
+	const onStop: GlobalShortcutCallback = () => {
 		console.log('stop recording')
 	}
-	const ioBindingHelper = new IOBindingHelper(onStart, onStop)
+	const ioBindingHelper = new GlobalShortcut(onStart, onStop)
 	ioBindingHelper.start()
 	console.log('Monitoring started. Press Cmd+Shift+R to trigger events...')
 }

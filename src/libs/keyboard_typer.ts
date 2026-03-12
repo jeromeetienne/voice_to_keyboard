@@ -1,9 +1,10 @@
 // npm imports
 import Robotjs from "robotjs";
 
-export class KeyTypingHelper {
-
-	static async typeString(text: string) {
+export class KeyboardTyper {
+	constructor() {
+	}
+	async typeString(text: string) {
 		Robotjs.typeString(text);
 
 		// const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -23,7 +24,8 @@ if (require.main === module) {
 		const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 		console.log('Waiting 5 seconds before typing the test string. Please focus the desired input field...');
 		await sleepAsync(5000);
-		await KeyTypingHelper.typeString("Hello, world!");
+		const keyboardTyper = new KeyboardTyper();
+		await keyboardTyper.typeString("Hello, world!");
 		console.log('minitest passed ✓');
 	})();
 }

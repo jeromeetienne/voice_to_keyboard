@@ -5,9 +5,9 @@ import Os from 'node:os';
 
 // local imports
 import { TranscriptionWhisper } from '../libs/transcription_whisper';
-import { IOBindingHelper, IOBindingCallback } from '../libs/iobinding_helper';
+import { GlobalShortcut, GlobalShortcutCallback } from '../libs/global_shortcut';
 import { MicRecorder } from '../libs/mic_recorder';
-import { KeyTypingHelper } from '../libs/key_typing_helper';
+import { KeyboardTyper } from '../libs/keyboard_typer';
 
 type AppState = 'idle' | 'recording' | 'processing';
 
@@ -43,9 +43,11 @@ export class Voice2KeyApp {
 		///////////////////////////////////////////////////////////////////////////////
 
 		// Start the microphone recorder
-		const recorder = new MicRecorder({ verbose: true });
+		const micRecorder = new MicRecorder({ verbose: true });
 		let appState: AppState = 'idle';
 		await onStateChange(appState);
+
+		const keyboardTyper = new KeyboardTyper();
 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +55,7 @@ export class Voice2KeyApp {
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 
-		const onStart: IOBindingCallback = () => {
+		const onStart: GlobalShortcutCallback = () => {
 			// switch from 'idle' to 'recording' state. 
 			// - If we're not in 'idle' state, ignore the event (could be a duplicate event or something else unexpected)
 			if (appState !== 'idle') {
@@ -67,12 +69,12 @@ export class Voice2KeyApp {
 				await onStateChange(appState);
 
 				console.log('start recording')
-				recorder.startRecording();
+				micRecorder.startRecording();
 			})().catch((err) => {
 				console.error('Error in onStart handler:', err);
 			});
 		}
-		const onStop: IOBindingCallback = () => {
+		const onStop: GlobalShortcutCallback = () => {
 			// switch from 'recording' to 'processing' state. 
 			// - If we're not in 'recording' state, ignore the event (could be a duplicate event or something else unexpected)
 			if (appState !== 'recording') {
@@ -86,7 +88,7 @@ export class Voice2KeyApp {
 				await onStateChange(appState);
 
 				console.log('stop recording');
-				const soundBuffer = await recorder.stopRecording();
+				const soundBuffer = await micRecorder.stopRecording();
 
 				// Save the recorded audio to a file
 				const soundPath = Path.join(Os.tmpdir(), `sound-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`);
@@ -108,7 +110,7 @@ export class Voice2KeyApp {
 				console.log('Text transcribed:', transcriptionText);
 
 				// Type the transcribed text using robotjs
-				await KeyTypingHelper.typeString(transcriptionText);
+				await keyboardTyper.typeString(transcriptionText);
 
 				appState = 'idle';
 				await onStateChange(appState);
@@ -123,7 +125,7 @@ export class Voice2KeyApp {
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 
-		const ioBindingHelper = new IOBindingHelper(onStart, onStop)
+		const ioBindingHelper = new GlobalShortcut(onStart, onStop)
 		ioBindingHelper.start()
 	}
 

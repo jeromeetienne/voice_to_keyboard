@@ -42,7 +42,13 @@ This first-time setup can take a while depending on network and machine speed.
 ## Run
 
 ```bash
-npm run dev
+npm run dev:terminal
+```
+
+Or run the menubar/tray app:
+
+```bash
+npm run dev:electron
 ```
 
 Usage flow:
@@ -64,17 +70,19 @@ If hotkeys do not trigger or typing does not happen, re-check Accessibility perm
 
 ## Scripts
 
-- npm run dev: run the main app (src/bin/index.ts)
+- npm run dev:terminal: run the app in terminal mode (src/bin/launcher_terminal.ts)
+- npm run dev:electron: run the Electron menubar app (src/bin/launcher_electron.ts)
 - npm run typecheck: TypeScript check only
 
 ## Project Structure
 
-- src/bin/index.ts: app entrypoint and state machine (idle -> recording -> processing)
+- src/app/voice2key_app.ts: app state machine (idle -> recording -> processing)
+- src/bin/launcher_terminal.ts: terminal launcher for the app
+- src/bin/launcher_electron.ts: Electron launcher with tray icon and menu
 - src/libs/iobinding_helper.ts: global hotkey listener (Cmd+Shift+R)
 - src/libs/mic_recorder.ts: microphone recording wrapper around rec
 - src/libs/transcription_whisper.ts: whisper.cpp install and transcription helper
 - src/libs/key_typing_helper.ts: text injection with robotjs
-- examples/: small standalone experiments for iohook/robotjs/recording
 - test_assets/test_sound.wav: sample audio for transcription mini-test
 - outputs/whisper.cpp/: local whisper.cpp installation and model files
 
@@ -89,8 +97,8 @@ If hotkeys do not trigger or typing does not happen, re-check Accessibility perm
 ## Development Notes
 
 - The hotkey is hardcoded to Cmd+Shift+R in iobinding_helper.
-- Transcription language defaults to en in src/bin/index.ts.
-- Model defaults to medium.en; you can change modelName in src/bin/index.ts.
+- Transcription language defaults to en in src/app/voice2key_app.ts.
+- Model defaults to medium.en; you can change modelName in src/app/voice2key_app.ts.
 - Audio is captured as 16kHz mono WAV to match whisper.cpp expectations.
 
 ## Troubleshooting

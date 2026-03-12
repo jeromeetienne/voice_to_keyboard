@@ -4,7 +4,7 @@ import Path from 'node:path';
 // local imports
 import Electron from "electron";
 import { Voice2KeyApp, Voice2KeyAppCallback } from '../app/voice2key_app';
-import { IOBindingHelper } from '../libs/iobinding_helper';
+import { GlobalShortcut } from '../libs/global_shortcut';
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,9 +59,9 @@ Electron.app.whenReady().then(async () => {
 	///////////////////////////////////////////////////////////////////////////////
 
 	// Check & request Accessibility permission
-	const hasKeyboardPermissions = await IOBindingHelper.checkPermissions()
+	const hasKeyboardPermissions = await GlobalShortcut.checkPermissions()
 	if (hasKeyboardPermissions === false) {
-		const hasPermissionsNow = await IOBindingHelper.requestPermissions()
+		const hasPermissionsNow = await GlobalShortcut.requestPermissions()
 		if (hasPermissionsNow === false) {
 			console.error('Accessibility permission not granted. Key monitoring will not work.')
 			// Optionally show a dialog and quit
