@@ -1,15 +1,14 @@
 // npm import
 import { downloadWhisperModel, installWhisperCpp, transcribe, toCaptions, Language } from '@remotion/install-whisper-cpp';
 
-// local import
-import { TranscriptionModelName, TranscriptionWordTiming, TranscriptionWordTimingItem } from '../types/transcription_whisper';
-
-
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //	Class
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+export type TranscriptionModelName = "medium.en" | "base" | "base.en" | "large-v1" | "large-v2" | "large-v3" | "large-v3-turbo" | "medium" | "small" | "small.en" | "tiny" | "tiny.en";
+
 
 /**
  * from https://www.remotion.dev/docs/install-whisper-cpp/
@@ -38,7 +37,7 @@ export class TranscriptionWhisper {
 		verbose?: boolean;
 		modelName?: TranscriptionModelName,
 		language?: Language;
-	} = {}): Promise<TranscriptionWordTiming> {
+	} = {}): Promise<string> {
 		// install if needed
 		await this.installIfNeeded(whisperPath, { verbose, modelName });
 
@@ -59,19 +58,10 @@ export class TranscriptionWhisper {
 			whisperCppOutput,
 		});
 
-		// Convert to our Transcription format - just for stability
-		const transcription: TranscriptionWordTiming = { words: [] };
-		for (const caption of captions) {
-			const transcriptionWord: TranscriptionWordTimingItem = {
-				text: caption.text,
-				startMs: caption.startMs,
-				endMs: caption.endMs,
-			};
-			transcription.words.push(transcriptionWord);
-		}
+		const transcribedText = captions.map((caption) => caption.text).join('');
 
 		// return the transcription
-		return transcription;
+		return transcribedText
 	}
 
 

@@ -1,39 +1,43 @@
 // node imports
 import Path from 'node:path';
 import Fs from 'node:fs';
+import Os from 'node:os';
 
 // local imports
 import { AudioHelper } from '../libs/audio_helper';
 import { TranscriptionWhisper } from '../libs/transcription_whisper';
 
-
 async function main() {
+	const verbose = true
 	// install whisper.cpp if needed
 	const whisperPath = Path.resolve(__dirname, '../../outputs/whisper.cpp');
 	await TranscriptionWhisper.installIfNeeded(whisperPath, {
-		verbose: true,
+		verbose: verbose,
 		modelName: 'medium.en',
 	});
 
 	// Record audio from the microphone
-	const soundBuffer = await AudioHelper.recordMicrophone();
+	const soundBuffer = await AudioHelper.recordMicrophone({
+		verbose: true,
+	});
 
 	// Save the recorded audio to a file
-	const soundPath = Path.resolve(__dirname, '../../outputs/output.wav');
+	const soundPath = Path.join(Os.tmpdir(), `sound-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`);
 	await Fs.promises.writeFile(soundPath, soundBuffer);
 	console.log(`Sound recorded and saved to ${soundPath}`);
 
 
-	// const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-	// // Wait for a few seconds to ensure the file is fully written and ready for processing
-	// await sleepAsync(3000);
-
+	console.log('Transcribing audio with whisper.cpp...');
 	// Transcribe the recorded audio using whisper.cpp
-	const transcription = await TranscriptionWhisper.transcribe(whisperPath, soundPath, {
-		verbose: false,
+	const transcriptionText = await TranscriptionWhisper.transcribe(whisperPath, soundPath, {
+		verbose: verbose,
+		language: 'en',
 	});
 
-	console.log('Transcription result:', transcription);
+	console.log('Text transcribed:', transcriptionText);
+
+	// Delete the temporary audio file
+	await Fs.promises.unlink(soundPath);
 }
 
 main().catch((err) => {
