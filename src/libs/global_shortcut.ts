@@ -65,6 +65,10 @@ export class GlobalShortcut {
 			// console.log('stop')
 			this._onStop()
 		})
+
+
+		iohook.setVerboseLogging(false);
+		iohook.enablePerformanceMode();
 	}
 
 

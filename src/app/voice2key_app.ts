@@ -43,7 +43,7 @@ export class Voice2KeyApp {
 		///////////////////////////////////////////////////////////////////////////////
 
 		// Start the microphone recorder
-		const micRecorder = new MicRecorder({ verbose: true });
+		const micRecorder = new MicRecorder({ verbose: verbose });
 		let appState: AppState = 'idle';
 		await onStateChange(appState);
 
