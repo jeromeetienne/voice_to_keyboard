@@ -30,7 +30,7 @@ export class TranscriptionWhisper {
 	 * @param options.modelName the whisper model to use. Default is 'medium.en'. See https://www.remotion.dev/docs/install-whisper-cpp/#models for available models. "medium.en" is a good default for English audio. If you are transcribing non-English audio, you may want to use "medium" or a model without the ".en" suffix.
 	 * @param options.language the language of the audio. This is used to help whisper.cpp transcribe better. Default is 'en' (English). See https://www.remotion.dev/docs/install-whisper-cpp/#languages for available languages
 	 */
-	static async transcribeVoice(whisperPath: string, audioWavPath: string, {
+	static async transcribe(whisperPath: string, audioWavPath: string, {
 		verbose = false,
 		modelName = 'medium.en',
 		language = 'en'

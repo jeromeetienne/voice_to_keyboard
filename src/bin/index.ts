@@ -22,6 +22,18 @@ async function main() {
 	const soundPath = Path.resolve(__dirname, '../../outputs/output.wav');
 	await Fs.promises.writeFile(soundPath, soundBuffer);
 	console.log(`Sound recorded and saved to ${soundPath}`);
+
+
+	// const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+	// // Wait for a few seconds to ensure the file is fully written and ready for processing
+	// await sleepAsync(3000);
+
+	// Transcribe the recorded audio using whisper.cpp
+	const transcription = await TranscriptionWhisper.transcribe(whisperPath, soundPath, {
+		verbose: false,
+	});
+
+	console.log('Transcription result:', transcription);
 }
 
 main().catch((err) => {
