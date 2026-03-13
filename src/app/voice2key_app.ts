@@ -2,6 +2,7 @@
 import Path from 'node:path';
 import Fs from 'node:fs';
 import Os from 'node:os';
+import Assert from 'assert'
 
 // local imports
 import { TranscriptionWhisper } from '../libs/transcription_whisper';
@@ -21,7 +22,7 @@ export type Voice2KeyAppCallback = (appState: AppState) => Promise<void>;
 
 export class Voice2KeyApp {
 	static async main(onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
-		const verbose = false
+		const verbose = true
 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +89,15 @@ export class Voice2KeyApp {
 				await onStateChange(appState);
 
 				console.log('stop recording');
-				const soundBuffer = await micRecorder.stopRecording();
+				let soundBuffer: Buffer | undefined
+				try {
+					soundBuffer = await micRecorder.stopRecording();
+				} catch (error) {
+					return
+				}
+
+				// sanity check - should never happen as micRecorder.stopRecording() should reject if there's an issue, but just in case
+				Assert.ok(soundBuffer, 'No sound buffer returned from micRecorder.stopRecording()');
 
 				// Save the recorded audio to a file
 				const soundPath = Path.join(Os.tmpdir(), `sound-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`);

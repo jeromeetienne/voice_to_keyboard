@@ -9,11 +9,13 @@ export class MicRecorder {
 	private child: ChildProcess.ChildProcess | null = null;
 	private resolveStop: ((buffer: Buffer) => void) | null = null;
 	private rejectStop: ((err: Error) => void) | null = null;
+	private readonly killSignal: NodeJS.Signals;
 	private readonly verbose: boolean;
 
 	constructor({ verbose = false }: { verbose?: boolean } = {}) {
 		this.verbose = verbose;
 		this.soundPath = Path.join(Os.tmpdir(), `sound-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`);
+		this.killSignal = 'SIGINT';
 	}
 
 	startRecording(): void {
@@ -25,12 +27,12 @@ export class MicRecorder {
 		const child_cmd = 'rec';
 		const child_args = ['-r', '16000', '-c', '1', '-b', '16', '-e', 'signed-integer', this.soundPath];
 
-		const child = ChildProcess.spawn(child_cmd, child_args, {
+		// Spawn the recording process
+		this.child = ChildProcess.spawn(child_cmd, child_args, {
 			stdio: this.verbose ? 'inherit' : 'ignore',
-		});
-		this.child = child;
+		});;
 
-		child.on('exit', (code: number | null) => {
+		this.child.on('exit', (code: number | null) => {
 			if (this.verbose) console.log(`rec exited with code ${code}`);
 
 			// code === null means the process was killed by a signal (our stopRecording() call) — treat as success
@@ -40,7 +42,7 @@ export class MicRecorder {
 				Fs.unlinkSync(this.soundPath);
 				this.resolveStop?.(soundBuffer);
 			} else {
-				if (Fs.existsSync(this.soundPath)) Fs.unlinkSync(this.soundPath);
+				if (fileExists) Fs.unlinkSync(this.soundPath);
 				this.rejectStop?.(new Error(`rec exited with code ${code}`));
 			}
 
@@ -58,7 +60,7 @@ export class MicRecorder {
 			}
 			this.resolveStop = resolve;
 			this.rejectStop = reject;
-			this.child.kill();
+			this.child.kill(this.killSignal);
 		});
 	}
 }

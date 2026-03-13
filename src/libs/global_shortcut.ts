@@ -30,42 +30,38 @@ export class GlobalShortcut {
 		this._isRunning = false;
 
 		iohook.addListener('keyDown', (eventData: EventData) => {
-			// console.log('Key Down:', {
-			// 	type: eventData.type,
-			// 	keyCode: eventData.keyCode,
-			// 	command: eventData.modifiers.command,
-			// 	shift: eventData.modifiers.shift,
-			// 	timestamp: eventData.timestamp,
-			// 	processId: eventData.processId
-			// })
-			if (eventData.modifiers.command === false) return
-			if (eventData.modifiers.shift === false) return
-			if (eventData.keyCode !== 15 /* R key */) return
-			if (this._isRunning) return
+			// GlobalShortcut.displayEventData(eventData)
+
+			// if not the proper key, return now
+			const isPushToTalkKey = this.isPushToTalkKey(eventData)
+			if (isPushToTalkKey === false) return
+
+			// if already running, return now
+			if (this._isRunning === true) return
+
+			// mark as running
+			// - important as it handle the case where the user press the key while already pressing it, which 
+			// can happen if the user hold the key for a long time and trigger multiple keyDown events
 			this._isRunning = true;
-			// console.log('start')
+
+			// notify the start callback
 			this._onStart()
 		})
 		iohook.addListener('keyUp', (eventData: EventData) => {
-			// console.log('Key Up:', {
-			// 	type: eventData.type,
-			// 	keyCode: eventData.keyCode,
-			// 	command: eventData.modifiers.command,
-			// 	shift: eventData.modifiers.shift,
-			// 	timestamp: eventData.timestamp,
-			// 	processId: eventData.processId
-			// })
+			// if not the proper key, return now
+			const isPushToTalkKey = this.isPushToTalkKey(eventData)
+			if (isPushToTalkKey === false) return
 
-			if (eventData.modifiers.command === false) return
-			if (eventData.modifiers.shift === false) return
-			if (eventData.keyCode !== 15 /* R key */) return
+			// if not running, return now
+			// - may happen if the user was pressing a key when launching the application
+			if (this._isRunning === false) return
 
-			Assert.ok(this._isRunning, 'Received keyUp event without a corresponding keyDown event')
+			// mark as not running
 			this._isRunning = false;
-			// console.log('stop')
+
+			// notify the stop callback
 			this._onStop()
 		})
-
 
 		iohook.setVerboseLogging(false);
 		iohook.enablePerformanceMode();
@@ -78,6 +74,36 @@ export class GlobalShortcut {
 
 	async stop() {
 		iohook.stopMonitoring();
+	}
+
+	isPushToTalkKey(eventData: EventData): boolean {
+		// key code 7 is the 'X' key
+		// key code 30 is the ']' key
+		if (eventData.keyCode !== 30) return false
+
+		if (eventData.modifiers.shift !== false) return false
+		if (eventData.modifiers.control !== false) return false
+		if (eventData.modifiers.option !== true) return false
+		if (eventData.modifiers.command !== true) return false
+		if (eventData.modifiers.capsLock !== false) return false
+		if (eventData.modifiers.fn !== false) return false
+		// if all checks passed, return true
+		return true
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	//	static function
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	static async displayEventData(eventData: EventData) {
+		const outputStr = [
+			`Event Type: ${eventData.type}`,
+			`   Key Code: ${eventData.keyCode}`,
+			`   Modifiers: ${JSON.stringify(eventData.modifiers, null, 2)}`
+		].join('\n')
+		console.log(outputStr);
 	}
 
 	/**

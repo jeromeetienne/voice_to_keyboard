@@ -5,13 +5,13 @@ export class KeyboardTyper {
 	constructor() {
 	}
 	async typeString(text: string) {
-		Robotjs.typeString(text);
+		// Robotjs.typeString(text);
 
-		// const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-		// for (const char of text) {
-		// 	Robotjs.keyTap(char);
-		// 	await sleepAsync(50 + Math.random() * 100);
-		// }
+		const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+		for (const char of text) {
+			Robotjs.keyTap(char);
+			await sleepAsync(10 + Math.random() * 300);
+		}
 	}
 }
 
@@ -26,6 +26,8 @@ if (require.main === module) {
 		await sleepAsync(5000);
 		const keyboardTyper = new KeyboardTyper();
 		await keyboardTyper.typeString("Hello, world!");
+		await sleepAsync(100);
+		console.log('')
 		console.log('minitest passed ✓');
 	})();
 }
