@@ -37,7 +37,6 @@ class ElectronAppHelper {
 		newWindow.show();
 
 		return newWindow
-
 	}
 
 	static async openAboutWindow() {

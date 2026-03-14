@@ -1,3 +1,8 @@
+- try to open native window for ABOUT
+- for a UX workflow, for the copy transcribed text, we can use the system clipboard
+- provide a configuration page 
+  - model selection
+  - language selection... can it do multiple languages at the same time?
 - it require to receive global key binding
 - it require to receive audio input from the microphone
 - check if the permissions are granted for both of these
