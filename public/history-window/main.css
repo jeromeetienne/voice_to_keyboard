@@ -1,0 +1,42 @@
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    flex-shrink: 0;
+}
+
+#historyList .list-group-item {
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+#historyList .list-group-item.selected {
+    background-color: #e8f1fb;
+    border-left-color: #2166b6;
+    color: #1f2a36;
+}
+
+.list-preview {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-date {
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+#historyList .list-group-item.selected .list-date {
+    color: #4f6274;
+}
+
+#entryText {
+    white-space: pre-wrap;
+}

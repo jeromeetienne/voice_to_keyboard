@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         entries.forEach((entry, index) => {
             const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action';
 
             const preview = document.createElement('div');
             preview.className = 'list-preview';

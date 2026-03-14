@@ -135,13 +135,13 @@ class HistoryWindowHelper {
 			height: 600,
 			title: 'Transcription History',
 			webPreferences: {
-				preload: Path.join(__dirname, 'preload.js'),
+				preload: Path.join(__dirname, 'launcher_electron_preload.js'),
 				nodeIntegration: false,
 				contextIsolation: true,
 			},
 		});
 		HistoryWindowHelper.historyWindow.on('closed', () => { HistoryWindowHelper.historyWindow = null; });
-		await HistoryWindowHelper.historyWindow.loadFile(Path.join(__dirname, '../../public/history/index.html'));
+		await HistoryWindowHelper.historyWindow.loadFile(Path.join(__dirname, '../../public/history-window/index.html'));
 	}
 
 	static getHistory(): TranscriptionHistoryEntry[] {
@@ -181,7 +181,7 @@ Electron.app.whenReady().then(async () => {
 	dummyWindow = new Electron.BrowserWindow({
 		show: false,
 		webPreferences: {
-			preload: Path.join(__dirname, 'preload.js'),
+			preload: Path.join(__dirname, 'launcher_electron_preload.js'),
 			nodeIntegration: false,
 			contextIsolation: true
 		}

@@ -3,7 +3,7 @@
 - provide a configuration page 
   - model selection
   - language selection... can it do multiple languages at the same time?
-- it require to receive global key binding
-- it require to receive audio input from the microphone
-- check if the permissions are granted for both of these
+- DONE it require to receive global key binding
+- DONE it require to receive audio input from the microphone
+- DONE check if the permissions are granted for both of these
   - else ask for it
