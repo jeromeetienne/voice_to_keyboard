@@ -1,9 +1,9 @@
-- Update CSS as little as possible in the public pages.
-- When the configuration changes, relook the whole application.
-- provide a configuration page 
+- DONE Update CSS as little as possible in the public pages.
+- DONE When the configuration changes, relaunch the whole application.
+- DONE provide a configuration page 
   - model selection
   - language selection... can it do multiple languages at the same time?
-- store a config file on disk for the settings
+- DONE store a config file on disk for the settings
   - then edit it, and reload it when the app is running
 - rename `Voice2Key` to `Voice2Kbd`
 - DONE try to open native window for ABOUT

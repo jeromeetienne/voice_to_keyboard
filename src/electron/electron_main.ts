@@ -146,9 +146,23 @@ class ConfigWindowHelper {
 			throw new Error('AppConfigManager not initialized');
 		}
 		try {
+			// Save the new config using the AppConfigManager
 			await ConfigWindowHelper.appConfigManager.save(config);
 			ConfigWindowHelper.currentConfig = config;
 			console.info(`${IPC_LOG_PREFIX} config saved successfully`);
+
+			// Show a notification to the user that the config was saved and the app will relaunch
+			new Electron.Notification({
+				title: 'Voice to Keyboard',
+				body: 'Configuration saved. The application will relaunch in 3 seconds.'
+			}).show();
+
+			// Wait a few seconds to ensure the user sees the notification before relaunching
+			await new Promise((resolve) => setTimeout(resolve, 3000));
+
+			// Relaunch the app to apply the new configuration
+			Electron.app.relaunch();
+			Electron.app.exit(0);
 		} catch (error) {
 			console.error(`${IPC_LOG_PREFIX} failed to save config:`, error);
 			throw error;
@@ -300,6 +314,12 @@ export class ElectronMain {
 		let dummyWindow: Electron.BrowserWindow | null = null;
 		Electron.app.whenReady().then(async () => {
 			ElectronAppHelper.setupIpcHandlers();
+
+			// Do a 'initialization' notification to let the user know the app is starting up (since it can take a few seconds)
+			new Electron.Notification({
+				title: "Voice to Keyboard",
+				body: "Initializing application..."
+			}).show();
 
 
 			///////////////////////////////////////////////////////////////////////////////
