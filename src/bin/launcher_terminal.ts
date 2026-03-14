@@ -1,5 +1,5 @@
 // local imports
-import { Voice2KeyApp } from '../app/voice2key_app';
+import { Voice2KbdApp } from '../app/voice2key_app';
 import { AppConfigManager } from '../libs/app_config';
 
 async function main() {
@@ -8,7 +8,7 @@ async function main() {
 	const appConfig = await appConfigManager.load() ?? AppConfigManager.getDefaultConfig();
 
 	// run the app
-	await Voice2KeyApp.main(appConfig, async (appState, transcribedText) => {
+	await Voice2KbdApp.main(appConfig, async (appState, transcribedText) => {
 		console.log(`App state changed to ${appState}`);
 		if (transcribedText) {
 			console.log(`Transcribed text: ${transcribedText}`);

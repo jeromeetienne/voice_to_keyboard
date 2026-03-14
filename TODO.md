@@ -5,7 +5,7 @@
   - language selection... can it do multiple languages at the same time?
 - DONE store a config file on disk for the settings
   - then edit it, and reload it when the app is running
-- rename `Voice2Key` to `Voice2Kbd`
+- DONE rename `Voice2Kbd` to `Voice2Kbd`
 - DONE try to open native window for ABOUT
 - DONE for a UX workflow, for the copy transcribed text, we can use the system clipboard
 - DONE it require to receive global key binding

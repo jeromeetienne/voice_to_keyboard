@@ -19,10 +19,10 @@ export type AppState = 'idle' | 'recording' | 'processing';
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-export type Voice2KeyAppCallback = (appState: AppState, transcribedText?: string) => Promise<void>;
+export type Voice2KbdAppCallback = (appState: AppState, transcribedText?: string) => Promise<void>;
 
-export class Voice2KeyApp {
-	static async main(appConfig: AppConfig, onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
+export class Voice2KbdApp {
+	static async main(appConfig: AppConfig, onStateChange: Voice2KbdAppCallback = async (appState) => { }) {
 		const verbose = true
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ if (require.main === module) {
 		const configManager = new AppConfigManager();
 		const config = await configManager.load() ?? AppConfigManager.getDefaultConfig();
 
-		await Voice2KeyApp.main(config, async (appState) => {
+		await Voice2KbdApp.main(config, async (appState) => {
 			console.log(`App state changed to ${appState}`);
 		});
 	})().catch((err) => {
