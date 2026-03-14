@@ -5,13 +5,13 @@ export class KeyboardTyper {
 	constructor() {
 	}
 	async typeString(text: string) {
-		// Robotjs.typeString(text);
+		Robotjs.typeString(text);
 
-		const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-		for (const char of text) {
-			Robotjs.keyTap(char);
-			await sleepAsync(10 + Math.random() * 300);
-		}
+		// const sleepAsync = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+		// for (const char of text) {
+		// 	await sleepAsync(10 + Math.random() * 100);
+		// 	Robotjs.keyTap(char);
+		// }
 	}
 }
 
