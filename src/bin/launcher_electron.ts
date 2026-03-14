@@ -51,6 +51,7 @@ class ElectronAppHelper {
 			width: 450,
 			height: 300,
 			show: false,
+			frame: false,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true
@@ -61,7 +62,13 @@ class ElectronAppHelper {
 		const htmlPath = Path.join(__dirname, '../../public/about/index.html');
 		const encodedVersion = encodeURIComponent(version);
 		aboutWindow.loadURL(`file://${htmlPath}?version=${encodedVersion}&model=medium.en`);
-		aboutWindow.show();
+
+		// // Resize window to fit content after loading
+		// aboutWindow.webContents.on('did-finish-load', () => {
+		// 	const size = aboutWindow.webContents.getPreferredSize();
+		// 	aboutWindow.setSize(size.width, size.height);
+		// 	aboutWindow.show();
+		// });
 
 		return aboutWindow;
 	}

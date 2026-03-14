@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	const isElectron = urlParams.get('electron') === 'true';
 
 	const textBox = /** @type {HTMLDivElement | null} */ (document.getElementById('textBox'));
-	const copyBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('copyBtn'));
+	const copyButton = /** @type {HTMLButtonElement | null} */ (document.getElementById('copyBtn'));
 	const infoDiv = /** @type {HTMLDivElement | null} */ (document.getElementById('info'));
 
 	if (textBox === null) throw new Error('textBox element not found');
-	if (copyBtn === null) throw new Error('copyBtn element not found');
+	if (copyButton === null) throw new Error('copyBtn element not found');
 	if (infoDiv === null) throw new Error('infoDiv element not found');
 
 
@@ -20,25 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		textBox.textContent = text;
 	} else {
 		textBox.innerHTML = '<div class="error">No transcribed text provided</div>';
-		copyBtn.disabled = true;
+		copyButton.disabled = true;
 		infoDiv.textContent = 'No text to copy';
 	}
 
 	// Copy button functionality
-	copyBtn.addEventListener('click', async () => {
+	copyButton.addEventListener('click', async () => {
 		try {
 			await navigator.clipboard.writeText(text);
-			copyBtn.textContent = 'Copied!';
-			copyBtn.classList.add('copied');
+			copyButton.textContent = 'Copied!';
+			copyButton.classList.add('copied');
 			setTimeout(() => {
-				copyBtn.textContent = 'Copy to Clipboard';
-				copyBtn.classList.remove('copied');
+				copyButton.textContent = 'Copy to Clipboard';
+				copyButton.classList.remove('copied');
 			}, 2000);
 		} catch (err) {
 			console.error('Failed to copy:', err);
-			copyBtn.textContent = 'Copy failed';
+			copyButton.textContent = 'Copy failed';
 			setTimeout(() => {
-				copyBtn.textContent = 'Copy to Clipboard';
+				copyButton.textContent = 'Copy to Clipboard';
 			}, 2000);
 		}
 	});
