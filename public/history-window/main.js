@@ -13,7 +13,7 @@
  * @type {ElectronAPI}
  */
 // @ts-ignore - electronAPI is injected by preload script
-window.electronAPI;
+let electronAPI = electronAPI;
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const historyList = /** @type {HTMLUListElement} */ (document.querySelector('#historyList'));
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const entryText = /** @type {HTMLDivElement} */ (document.querySelector('#entryText'));
 	const copyBtn = /** @type {HTMLButtonElement} */ (document.querySelector('#copyBtn'));
 
-	if (!window.electronAPI || typeof window.electronAPI.getTranscriptionHistory !== 'function') {
+	if (!electronAPI || typeof electronAPI.getTranscriptionHistory !== 'function') {
 		detailEmpty.textContent = 'This page must run inside the Electron app.';
 		copyBtn.disabled = true;
 		return;
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	/** @type {TranscriptionEntry[]} */
-	let historyEntries = await window.electronAPI.getTranscriptionHistory();
+	let historyEntries = await electronAPI.getTranscriptionHistory();
 	populateList(historyEntries);
 
 	copyBtn.addEventListener('click', async () => {
@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	});
 
-	if (typeof window.electronAPI.onHistoryUpdated === 'function') {
-		window.electronAPI.onHistoryUpdated((/** @type {TranscriptionEntry[]} */ entries) => {
+	if (typeof electronAPI.onHistoryUpdated === 'function') {
+		electronAPI.onHistoryUpdated((/** @type {TranscriptionEntry[]} */ entries) => {
 			historyEntries = entries;
 			populateList(entries);
 		});
