@@ -39,7 +39,38 @@ class ElectronAppHelper {
 		return newWindow
 
 	}
+
+	static async openAboutWindow() {
+		// Get version from package.json
+		const packageJsonPath = Path.join(__dirname, '../../package.json');
+		const packageJson = JSON.parse(require('node:fs').readFileSync(packageJsonPath, 'utf-8'));
+		const version = packageJson.version || '1.0.0';
+
+		// Create and show the About window
+		const aboutWindow = new Electron.BrowserWindow({
+			width: 450,
+			height: 300,
+			show: false,
+			webPreferences: {
+				nodeIntegration: false,
+				contextIsolation: true
+			}
+		});
+
+		// Load the HTML file with version passed as URL parameter
+		const htmlPath = Path.join(__dirname, '../../public/about/index.html');
+		const encodedVersion = encodeURIComponent(version);
+		aboutWindow.loadURL(`file://${htmlPath}?version=${encodedVersion}&model=medium.en`);
+		aboutWindow.show();
+
+		return aboutWindow;
+	}
 }
+Electron.app.on('window-all-closed', () => {
+	// Don't quit the app when all windows are closed - let the tray keep it alive
+	// This allows the app to continue running in the background
+});
+
 Electron.app.whenReady().then(async () => {
 	// Create all the tray icons we need upfront so that they're cached and show up instantly when we switch them in the tray
 	const imageNativeIdle = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-mic-20x20.png"));
@@ -61,8 +92,8 @@ Electron.app.whenReady().then(async () => {
 
 	const dropDownMenu = Electron.Menu.buildFromTemplate([
 		{
-			role: "about",
-			label: "About VoiceToKeyboard"
+			label: "About VoiceToKeyboard",
+			click: () => ElectronAppHelper.openAboutWindow()
 		},
 		{
 			label: "Github",
