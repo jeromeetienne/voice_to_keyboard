@@ -1,3 +1,5 @@
+- Update CSS as little as possible in the public pages.
+- When the configuration changes, relook the whole application.
 - provide a configuration page 
   - model selection
   - language selection... can it do multiple languages at the same time?
