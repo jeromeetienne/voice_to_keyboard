@@ -10,7 +10,9 @@
  */
 
 /**
- * @type {ElectronAPI}
+ * Created in the preload script and exposed via contextBridge
+ * 
+ * @type {ElectronAPI} 
  */
 // @ts-ignore - electronAPI is injected by preload script
 let electronAPI = electronAPI;
