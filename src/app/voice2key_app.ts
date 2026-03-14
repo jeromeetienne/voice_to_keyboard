@@ -10,7 +10,7 @@ import { GlobalShortcut, GlobalShortcutCallback } from '../libs/global_shortcut'
 import { MicRecorder } from '../libs/mic_recorder';
 import { KeyboardTyper } from '../libs/keyboard_typer';
 
-type AppState = 'idle' | 'recording' | 'processing';
+export type AppState = 'idle' | 'recording' | 'processing';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ type AppState = 'idle' | 'recording' | 'processing';
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-export type Voice2KeyAppCallback = (appState: AppState) => Promise<void>;
+export type Voice2KeyAppCallback = (appState: AppState, transcribedText?: string) => Promise<void>;
 
 export class Voice2KeyApp {
 	static async main(onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
@@ -122,7 +122,7 @@ export class Voice2KeyApp {
 				await keyboardTyper.typeString(transcriptionText);
 
 				appState = 'idle';
-				await onStateChange(appState);
+				await onStateChange(appState, transcriptionText);
 			})().catch((err) => {
 				console.error('Error in onStop handler:', err);
 			});

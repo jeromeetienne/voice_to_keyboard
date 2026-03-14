@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcribed Text</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .text-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+            user-select: all;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            word-wrap: break-word;
+            min-height: 80px;
+        }
+
+        .info {
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #0052a3;
+        }
+
+        button:active {
+            background: #003d7a;
+        }
+
+        button.copied {
+            background: #34C759;
+        }
+
+        .error {
+            color: #d32f2f;
+            padding: 15px;
+            background: #ffebee;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Transcribed Text</h2>
+        <div class="text-box" id="textBox"></div>
+        <div class="button-container">
+            <button id="copyBtn">Copy to Clipboard</button>
+        </div>
+        <div class="info" id="info">This window will close in 10 seconds.</div>
+    </div>
+
+    <script>
+        // Get the transcribed text from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const text = urlParams.get('text') || '';
+        const isElectron = urlParams.get('electron') === 'true';
+
+        const textBox = document.getElementById('textBox');
+        const copyBtn = document.getElementById('copyBtn');
+        const infoDiv = document.getElementById('info');
+
+        // Display the text
+        if (text) {
+            textBox.textContent = text;
+        } else {
+            textBox.innerHTML = '<div class="error">No transcribed text provided</div>';
+            copyBtn.disabled = true;
+            infoDiv.textContent = 'No text to copy';
+        }
+
+        // Copy button functionality
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.textContent = 'Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy to Clipboard';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                copyBtn.textContent = 'Copy failed';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy to Clipboard';
+                }, 2000);
+            }
+        });
+
+        // If running in Electron, close after 10 seconds
+        if (isElectron) {
+            setTimeout(() => {
+                window.close();
+            }, 10000);
+        }
+    </script>
+</body>
+
+</html>
