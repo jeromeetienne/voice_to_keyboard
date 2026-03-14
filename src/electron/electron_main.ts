@@ -7,13 +7,18 @@ import Electron from "electron";
 import { Voice2KeyApp, Voice2KeyAppCallback } from '../app/voice2key_app';
 import { GlobalShortcut } from '../libs/global_shortcut';
 import { AppState } from '../app/voice2key_app';
-import { AppConfig } from '../libs/app_config';
+import { AppConfig, AppConfigManager } from '../libs/app_config';
 
 const IPC_CHANNELS = {
 	SHOW_ABOUT: 'show-about',
 	MENU_ABOUT_CLICKED: 'menu-about-clicked',
 	GET_TRANSCRIPTION_HISTORY: 'get-transcription-history',
 	HISTORY_UPDATED: 'history-updated',
+	GET_CONFIG: 'get-config',
+	SAVE_CONFIG: 'save-config',
+	GET_AVAILABLE_LANGUAGES: 'get-available-languages',
+	GET_AVAILABLE_MODELS: 'get-available-models',
+	GET_DEFAULT_CONFIG: 'get-default-config',
 } as const;
 
 const IPC_LOG_PREFIX = '[voice2key][ipc]';
@@ -82,6 +87,96 @@ class AboutDialogHelper {
 	}
 }
 
+class ConfigWindowHelper {
+	// Configuration window instance
+	private static configWindow: Electron.BrowserWindow | null = null;
+	// Reference to AppConfigManager (will be set in ElectronMain.main)
+	private static appConfigManager: any = null;
+	// Current app configuration
+	private static currentConfig: AppConfig | null = null;
+
+	/**
+	 * Set the AppConfigManager instance
+	 */
+	static setAppConfigManager(manager: any): void {
+		ConfigWindowHelper.appConfigManager = manager;
+	}
+
+	/**
+	 * Set the current app configuration
+	 */
+	static setCurrentConfig(config: AppConfig): void {
+		ConfigWindowHelper.currentConfig = config;
+	}
+
+	/**
+	 * Open the configuration window or focus existing one
+	 */
+	static async openConfigWindow(): Promise<void> {
+		if (ConfigWindowHelper.configWindow && !ConfigWindowHelper.configWindow.isDestroyed()) {
+			ConfigWindowHelper.configWindow.focus();
+			return;
+		}
+		ConfigWindowHelper.configWindow = new Electron.BrowserWindow({
+			width: 700,
+			height: 600,
+			title: 'Voice to Keyboard Configuration',
+			webPreferences: {
+				preload: Path.join(__dirname, 'launcher_electron_preload.js'),
+				nodeIntegration: false,
+				contextIsolation: true,
+			},
+		});
+		ConfigWindowHelper.configWindow.on('closed', () => { ConfigWindowHelper.configWindow = null; });
+		await ConfigWindowHelper.configWindow.loadFile(Path.join(__dirname, '../../public/config-window/index.html'));
+	}
+
+	/**
+	 * Get current configuration
+	 */
+	static getConfig(): AppConfig {
+		return ConfigWindowHelper.currentConfig || AppConfigManager.getDefaultConfig();
+	}
+
+	/**
+	 * Save configuration
+	 */
+	static async saveConfig(config: AppConfig): Promise<void> {
+		if (!ConfigWindowHelper.appConfigManager) {
+			throw new Error('AppConfigManager not initialized');
+		}
+		try {
+			await ConfigWindowHelper.appConfigManager.save(config);
+			ConfigWindowHelper.currentConfig = config;
+			console.info(`${IPC_LOG_PREFIX} config saved successfully`);
+		} catch (error) {
+			console.error(`${IPC_LOG_PREFIX} failed to save config:`, error);
+			throw error;
+		}
+	}
+
+	/**
+	 * Get available languages
+	 */
+	static getAvailableLanguages(): string[] {
+		return AppConfigManager.getAvailableLanguages();
+	}
+
+	/**
+	 * Get available models
+	 */
+	static getAvailableModels(): string[] {
+		return AppConfigManager.getAvailableModels();
+	}
+
+	/**
+	 * Get default configuration
+	 */
+	static getDefaultConfig(): AppConfig {
+		return AppConfigManager.getDefaultConfig();
+	}
+}
+
 class ElectronAppHelper {
 
 	/**
@@ -101,6 +196,31 @@ class ElectronAppHelper {
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY, () => {
 			return HistoryWindowHelper.getHistory();
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_CONFIG);
+		Electron.ipcMain.handle(IPC_CHANNELS.GET_CONFIG, () => {
+			return ConfigWindowHelper.getConfig();
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.SAVE_CONFIG);
+		Electron.ipcMain.handle(IPC_CHANNELS.SAVE_CONFIG, (_event, config) => {
+			return ConfigWindowHelper.saveConfig(config);
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES);
+		Electron.ipcMain.handle(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES, () => {
+			return ConfigWindowHelper.getAvailableLanguages();
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_AVAILABLE_MODELS);
+		Electron.ipcMain.handle(IPC_CHANNELS.GET_AVAILABLE_MODELS, () => {
+			return ConfigWindowHelper.getAvailableModels();
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_DEFAULT_CONFIG);
+		Electron.ipcMain.handle(IPC_CHANNELS.GET_DEFAULT_CONFIG, () => {
+			return ConfigWindowHelper.getDefaultConfig();
 		});
 	}
 }
@@ -231,6 +351,10 @@ export class ElectronMain {
 					click: () => AboutDialogHelper.triggerAboutFromMenu(dummyWindow),
 				},
 				{
+					label: 'Configuration',
+					click: async () => { await ConfigWindowHelper.openConfigWindow(); },
+				},
+				{
 					label: 'Show Transcription History',
 					click: async () => { await HistoryWindowHelper.openHistoryWindow(); },
 				},
@@ -340,6 +464,16 @@ export class ElectronMain {
 				// update the last app state
 				lastAppState = appState;
 			}
+
+			///////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////
+			//	Initialize Configuration Window Helper
+			///////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////
+
+			const appConfigManager = new AppConfigManager();
+			ConfigWindowHelper.setAppConfigManager(appConfigManager);
+			ConfigWindowHelper.setCurrentConfig(appConfig);
 
 			///////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////
