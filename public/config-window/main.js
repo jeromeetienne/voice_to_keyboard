@@ -15,15 +15,9 @@
  * }} ElectronAPI
  */
 
-/**
- * Created in the preload script and exposed via contextBridge
- *
- * @type {ElectronAPI}
- */
-// @ts-ignore - electronAPI is injected by preload script
-let electronAPI = electronAPI;
-
 document.addEventListener('DOMContentLoaded', async () => {
+    // @ts-ignore - electronAPI is injected by preload script
+    const electronAPI = window.electronAPI;
     const configForm = /** @type {HTMLFormElement} */ (document.querySelector('#configForm'));
     const languageSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#languageSelect'));
     const modelSelect = /** @type {HTMLSelectElement} */ (document.querySelector('#modelSelect'));

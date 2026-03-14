@@ -14,15 +14,9 @@
 //  * }} ElectronAPI
 //  */
 
-/**
- * Created in the preload script and exposed via contextBridge
- * 
- * @type {ElectronAPI} 
- */
-// @ts-ignore - electronAPI is injected by preload script
-let electronAPI = electronAPI;
-
 document.addEventListener('DOMContentLoaded', async () => {
+    // @ts-ignore - electronAPI is injected by preload script
+    const electronAPI = window.electronAPI;
     const historyList = /** @type {HTMLUListElement} */ (document.querySelector('#historyList'));
     const detailEmpty = /** @type {HTMLDivElement} */ (document.querySelector('#detailEmpty'));
     const detailContent = /** @type {HTMLDivElement} */ (document.querySelector('#detailContent'));

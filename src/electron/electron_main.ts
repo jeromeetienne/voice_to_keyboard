@@ -269,6 +269,7 @@ class HistoryWindowHelper {
 		});
 		HistoryWindowHelper.historyWindow.on('closed', () => { HistoryWindowHelper.historyWindow = null; });
 		await HistoryWindowHelper.historyWindow.loadFile(Path.join(__dirname, '../../public/history-window/index.html'));
+		// HistoryWindowHelper.historyWindow.webContents.openDevTools();
 	}
 
 	static getHistory(): TranscriptionHistoryEntry[] {
