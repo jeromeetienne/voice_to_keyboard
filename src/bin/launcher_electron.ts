@@ -11,9 +11,17 @@ import { AppState } from '../app/voice2key_app';
 const IPC_CHANNELS = {
 	SHOW_ABOUT: 'show-about',
 	MENU_ABOUT_CLICKED: 'menu-about-clicked',
+	GET_TRANSCRIPTION_HISTORY: 'get-transcription-history',
+	HISTORY_UPDATED: 'history-updated',
 } as const;
 
 const IPC_LOG_PREFIX = '[voice2key][ipc]';
+const MAX_HISTORY_ENTRIES = 100;
+
+type TranscriptionHistoryEntry = {
+	text: string;
+	createdAt: string;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,12 +29,11 @@ const IPC_LOG_PREFIX = '[voice2key][ipc]';
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-class ElectronAppHelper {
+class AboutDialogHelper {
 	/**
 	 * Reads and returns the version of VoiceToKeyboard from package.json.
-	 * @returns {Promise<string>} The version string from package.json.
 	 */
-	static async getVoiceToKeyboardVersion() {
+	static async getVoiceToKeyboardVersion(): Promise<string> {
 		const filePath = Path.join(__dirname, '../../package.json');
 		const fileContent = await Fs.promises.readFile(filePath, 'utf-8');
 		const packageJson = JSON.parse(fileContent);
@@ -37,10 +44,10 @@ class ElectronAppHelper {
 	 * Displays the About dialog with version and environment information.
 	 * Uses Electron's dialog API to show a message box.
 	 */
-	static async showAboutDialog() {
+	static async showAboutDialog(): Promise<void> {
 		console.info(`${IPC_LOG_PREFIX} showAboutDialog requested`);
 		const detailContent = [
-			`Version: ${await ElectronAppHelper.getVoiceToKeyboardVersion()}`,
+			`Version: ${await AboutDialogHelper.getVoiceToKeyboardVersion()}`,
 			`Electron: ${process.versions.electron}`,
 			`Node: ${process.versions.node}`
 		].join('\n');
@@ -55,27 +62,12 @@ class ElectronAppHelper {
 	}
 
 	/**
-	 * Registers IPC handlers for communication between renderer and main process.
-	 * Specifically, handles requests to show the About dialog.
-	 */
-	static setupIpcHandlers() {
-		console.info(`${IPC_LOG_PREFIX} registering IPC handler for ${IPC_CHANNELS.SHOW_ABOUT}`);
-		// Remove any existing handler to avoid duplicate handlers
-		Electron.ipcMain.removeHandler(IPC_CHANNELS.SHOW_ABOUT);
-		// Register a new handler for the SHOW_ABOUT channel
-		Electron.ipcMain.handle(IPC_CHANNELS.SHOW_ABOUT, () => {
-			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.SHOW_ABOUT}`);
-			return ElectronAppHelper.showAboutDialog();
-		});
-	}
-
-	/**
 	 * Triggers the About dialog from the tray menu.
 	 * If the hidden window exists, sends an IPC message to it.
 	 * Otherwise, shows the About dialog directly as a fallback.
 	 * @param targetWindow The hidden BrowserWindow used for IPC communication.
 	 */
-	static triggerAboutFromMenu(targetWindow: Electron.BrowserWindow | null) {
+	static triggerAboutFromMenu(targetWindow: Electron.BrowserWindow | null): void {
 		console.info(`${IPC_LOG_PREFIX} menu click received, forwarding via ${IPC_CHANNELS.MENU_ABOUT_CLICKED}`);
 		if (targetWindow && !targetWindow.isDestroyed()) {
 			console.info(`${IPC_LOG_PREFIX} sending ${IPC_CHANNELS.MENU_ABOUT_CLICKED} to hidden window`);
@@ -85,13 +77,81 @@ class ElectronAppHelper {
 
 		// Fallback for unexpected cases where the hidden window is unavailable.
 		console.warn(`${IPC_LOG_PREFIX} hidden window unavailable, falling back to direct dialog`);
-		void ElectronAppHelper.showAboutDialog();
+		void AboutDialogHelper.showAboutDialog();
+	}
+}
+
+class ElectronAppHelper {
+
+	/**
+	 * Registers IPC handlers for communication between renderer and main process.
+	 * Specifically, handles requests to show the About dialog.
+	 */
+	static setupIpcHandlers(): void {
+		console.info(`${IPC_LOG_PREFIX} registering IPC handler for ${IPC_CHANNELS.SHOW_ABOUT}`);
+		// Remove any existing handler to avoid duplicate handlers
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.SHOW_ABOUT);
+		// Register a new handler for the SHOW_ABOUT channel
+		Electron.ipcMain.handle(IPC_CHANNELS.SHOW_ABOUT, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.SHOW_ABOUT}`);
+			return AboutDialogHelper.showAboutDialog();
+		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY);
+		Electron.ipcMain.handle(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY, () => {
+			return HistoryWindowHelper.getHistory();
+		});
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//	
+//
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+class HistoryWindowHelper {
+	// In-memory transcription history (newest first)
+	private static transcriptionHistory: TranscriptionHistoryEntry[] = [];
+	private static historyWindow: Electron.BrowserWindow | null = null;
+
+	static appendTranscriptionToHistory(text: string): void {
+		HistoryWindowHelper.transcriptionHistory.unshift({ text, createdAt: new Date().toISOString() });
+		if (HistoryWindowHelper.transcriptionHistory.length > MAX_HISTORY_ENTRIES) {
+			HistoryWindowHelper.transcriptionHistory.length = MAX_HISTORY_ENTRIES;
+		}
+		if (HistoryWindowHelper.historyWindow && !HistoryWindowHelper.historyWindow.isDestroyed()) {
+			HistoryWindowHelper.historyWindow.webContents.send(IPC_CHANNELS.HISTORY_UPDATED, [...HistoryWindowHelper.transcriptionHistory]);
+		}
+	}
+
+	static async openHistoryWindow(): Promise<void> {
+		if (HistoryWindowHelper.historyWindow && !HistoryWindowHelper.historyWindow.isDestroyed()) {
+			HistoryWindowHelper.historyWindow.focus();
+			return;
+		}
+		HistoryWindowHelper.historyWindow = new Electron.BrowserWindow({
+			width: 800,
+			height: 600,
+			title: 'Transcription History',
+			webPreferences: {
+				preload: Path.join(__dirname, 'preload.js'),
+				nodeIntegration: false,
+				contextIsolation: true,
+			},
+		});
+		HistoryWindowHelper.historyWindow.on('closed', () => { HistoryWindowHelper.historyWindow = null; });
+		await HistoryWindowHelper.historyWindow.loadFile(Path.join(__dirname, '../../public/history/index.html'));
+	}
+
+	static getHistory(): TranscriptionHistoryEntry[] {
+		return [...HistoryWindowHelper.transcriptionHistory];
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -103,13 +163,14 @@ Electron.app.on('window-all-closed', () => {
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//	
+//
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 let dummyWindow: Electron.BrowserWindow | null = null;
 Electron.app.whenReady().then(async () => {
 	ElectronAppHelper.setupIpcHandlers();
+
 
 	///////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
@@ -142,7 +203,8 @@ Electron.app.whenReady().then(async () => {
 	///////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
 
-	// Create all the tray icons we need upfront so that they're cached and show up instantly when we switch them in the tray
+	// Create all the tray icons we need upfront so that they're cached 
+	// and show up instantly when we switch them in the tray
 	const imageNativeIdle = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-mic-20x20.png"));
 	imageNativeIdle.setTemplateImage(true);
 	const imageNativeRecording = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-mic-fill-20x20.png"));
@@ -163,7 +225,11 @@ Electron.app.whenReady().then(async () => {
 	const dropDownMenu = Electron.Menu.buildFromTemplate([
 		{
 			label: "About VoiceToKeyboard",
-			click: () => ElectronAppHelper.triggerAboutFromMenu(dummyWindow),
+			click: () => AboutDialogHelper.triggerAboutFromMenu(dummyWindow),
+		},
+		{
+			label: 'Show Transcription History',
+			click: async () => { await HistoryWindowHelper.openHistoryWindow(); },
 		},
 		{
 			label: "Github",
@@ -253,6 +319,9 @@ Electron.app.whenReady().then(async () => {
 	const appCallback: Voice2KeyAppCallback = async (appState, transcribedText) => {
 		if (appState === 'idle') {
 			await onAppStateIdle(transcribedText);
+			if (lastAppState === 'processing' && transcribedText) {
+				HistoryWindowHelper.appendTranscriptionToHistory(transcribedText);
+			}
 		} else if (appState === 'recording') {
 			await onAppStateRecording();
 		} else if (appState === 'processing') {
@@ -265,7 +334,6 @@ Electron.app.whenReady().then(async () => {
 		// update the last app state
 		lastAppState = appState;
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
