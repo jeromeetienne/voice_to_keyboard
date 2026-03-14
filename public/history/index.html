@@ -10,21 +10,21 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Transcription History</h1>
-        <p class="subtitle">Select a past transcription from the dropdown menu.</p>
-
-        <div class="controls">
-            <label for="historySelect">History entries</label>
-            <select id="historySelect"></select>
-        </div>
-
-        <div class="meta" id="entryTime">No entry selected</div>
-        <div class="text-box" id="entryText"></div>
-
-        <div class="actions">
-            <button id="copyBtn" type="button">Copy Selected Text</button>
-        </div>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">History</div>
+            <ul id="historyList"></ul>
+        </aside>
+        <main class="detail">
+            <div class="detail-empty" id="detailEmpty">Select a transcription to view its content.</div>
+            <div class="detail-content" id="detailContent" hidden>
+                <div class="detail-meta" id="entryTime"></div>
+                <div class="detail-text" id="entryText"></div>
+                <div class="actions">
+                    <button id="copyBtn" type="button">Copy Text</button>
+                </div>
+            </div>
+        </main>
     </div>
 </body>
 
