@@ -150,7 +150,7 @@ export class Voice2KeyApp {
 if (require.main === module) {
 	(async () => {
 		const configManager = new AppConfigManager();
-		const config = configManager.load() ?? AppConfigManager.getDefaultConfig();
+		const config = await configManager.load() ?? AppConfigManager.getDefaultConfig();
 
 		await Voice2KeyApp.main(config, async (appState) => {
 			console.log(`App state changed to ${appState}`);

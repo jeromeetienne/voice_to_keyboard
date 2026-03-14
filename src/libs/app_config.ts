@@ -36,12 +36,12 @@ export class AppConfigManager {
 	 * Load the application configuration from the JSON file
 	 * @returns the app configuration, or null if file doesn't exist
 	 */
-	load(): AppConfig | null {
+	async load(): Promise<AppConfig | null> {
 		try {
 			if (!Fs.existsSync(this.configPath)) {
 				return null;
 			}
-			const data = Fs.readFileSync(this.configPath, 'utf-8');
+			const data = await Fs.promises.readFile(this.configPath, 'utf-8');
 			const config = JSON.parse(data) as AppConfig;
 			return config;
 		} catch (error) {
@@ -54,16 +54,16 @@ export class AppConfigManager {
 	 * Save the application configuration to the JSON file
 	 * @param config the configuration to save
 	 */
-	save(config: AppConfig): void {
+	async save(config: AppConfig): Promise<void> {
 		try {
 			// Ensure output directory exists
 			const outputDir = Path.dirname(this.configPath);
 			if (!Fs.existsSync(outputDir)) {
-				Fs.mkdirSync(outputDir, { recursive: true });
+				await Fs.promises.mkdir(outputDir, { recursive: true });
 			}
 
 			// Write the config file
-			Fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2));
+			await Fs.promises.writeFile(this.configPath, JSON.stringify(config, null, 2));
 		} catch (error) {
 			console.error('Failed to save app config:', error);
 			throw error;
@@ -156,10 +156,10 @@ if (require.main === module) {
 			transcriptionModel: 'medium.en',
 		};
 
-		configManager.save(testConfig);
+		await configManager.save(testConfig);
 		console.log('Config saved to:', Path.resolve(__dirname, '../../outputs/appconfig.json'));
 
-		const loadedConfig = configManager.load();
+		const loadedConfig = await configManager.load();
 		console.log('Loaded config:', loadedConfig);
 
 		console.log('minitest passed ✓');

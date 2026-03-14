@@ -5,7 +5,7 @@ import { AppConfigManager } from '../libs/app_config';
 async function main() {
 	// load the app configuration
 	const appConfigManager = new AppConfigManager();
-	const appConfig = appConfigManager.load() ?? AppConfigManager.getDefaultConfig();
+	const appConfig = await appConfigManager.load() ?? AppConfigManager.getDefaultConfig();
 
 	// run the app
 	await ElectronMain.main(appConfig);
