@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            text-align: center;
+            max-width: 380px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .version {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .footer {
+            color: #999;
+            font-size: 12px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="logo">ℹ️</div>
+        <h1>About This App</h1>
+        <p class="version">Electron Window Types Demo</p>
+
+        <p class="description">
+            Learn how to create and manage different types of windows in Electron, including dialogs, message boxes, and
+            secondary windows.
+        </p>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">App Name:</span>
+                <span class="info-value" id="appName">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Version:</span>
+                <span class="info-value" id="appVersion">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Electron:</span>
+                <span class="info-value" id="electronVersion">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Node:</span>
+                <span class="info-value" id="nodeVersion">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Chrome:</span>
+                <span class="info-value" id="chromeVersion">-</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This window is a modal, non-resizable About window.</p>
+        </div>
+    </div>
+
+    <script>
+        // Load app info
+        async function loadAppInfo() {
+            try {
+                const info = await window.electronAPI.getAppInfo();
+                document.getElementById('appName').textContent = info.appName || 'Electron App';
+                document.getElementById('appVersion').textContent = info.appVersion || '1.0.0';
+                document.getElementById('electronVersion').textContent = info.electronVersion || '-';
+                document.getElementById('nodeVersion').textContent = info.nodeVersion || '-';
+                document.getElementById('chromeVersion').textContent = info.chromeVersion || '-';
+            } catch (error) {
+                console.error('Failed to load app info:', error);
+            }
+        }
+
+        loadAppInfo();
+    </script>
+</body>
+
+</html>

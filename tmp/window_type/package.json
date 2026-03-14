@@ -1,0 +1,20 @@
+{
+    "name": "electron-window-types-demo",
+    "version": "1.0.0",
+    "description": "Demo of Electron window types, dialogs, and message boxes",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "dev": "electron . --enable-logging"
+    },
+    "keywords": [
+        "electron",
+        "windows",
+        "dialogs"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "latest"
+    }
+}
