@@ -1,8 +1,11 @@
-- try to open native window for ABOUT
-- for a UX workflow, for the copy transcribed text, we can use the system clipboard
 - provide a configuration page 
   - model selection
   - language selection... can it do multiple languages at the same time?
+- store a config file on disk for the settings
+  - then edit it, and reload it when the app is running
+- rename `Voice2Key` to `Voice2Kbd`
+- DONE try to open native window for ABOUT
+- DONE for a UX workflow, for the copy transcribed text, we can use the system clipboard
 - DONE it require to receive global key binding
 - DONE it require to receive audio input from the microphone
 - DONE check if the permissions are granted for both of these
