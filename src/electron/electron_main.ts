@@ -195,31 +195,37 @@ class ElectronAppHelper {
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_TRANSCRIPTION_HISTORY}`);
 			return HistoryWindowHelper.getHistory();
 		});
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_CONFIG);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_CONFIG, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_CONFIG}`);
 			return ConfigWindowHelper.getConfig();
 		});
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.SAVE_CONFIG);
-		Electron.ipcMain.handle(IPC_CHANNELS.SAVE_CONFIG, (_event, config) => {
-			return ConfigWindowHelper.saveConfig(config);
+		Electron.ipcMain.handle(IPC_CHANNELS.SAVE_CONFIG, (_event, appConfig) => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.SAVE_CONFIG} with config:`, appConfig);
+			return ConfigWindowHelper.saveConfig(appConfig);
 		});
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_AVAILABLE_LANGUAGES}`);
 			return ConfigWindowHelper.getAvailableLanguages();
 		});
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_AVAILABLE_MODELS);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_AVAILABLE_MODELS, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_AVAILABLE_MODELS}`);
 			return ConfigWindowHelper.getAvailableModels();
 		});
 
 		Electron.ipcMain.removeHandler(IPC_CHANNELS.GET_DEFAULT_CONFIG);
 		Electron.ipcMain.handle(IPC_CHANNELS.GET_DEFAULT_CONFIG, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_DEFAULT_CONFIG}`);
 			return ConfigWindowHelper.getDefaultConfig();
 		});
 	}

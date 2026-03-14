@@ -26,7 +26,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on(IPC_CHANNELS.HISTORY_UPDATED, (_event, entries) => callback(entries));
     },
     getConfig: () => ipcRenderer.invoke(IPC_CHANNELS.GET_CONFIG),
-    saveConfig: (config) => ipcRenderer.invoke(IPC_CHANNELS.SAVE_CONFIG, config),
+    /**
+     * @param {object} appConfig
+     */
+    saveConfig: (appConfig) => ipcRenderer.invoke(IPC_CHANNELS.SAVE_CONFIG, appConfig),
     getAvailableLanguages: () => ipcRenderer.invoke(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES),
     getAvailableModels: () => ipcRenderer.invoke(IPC_CHANNELS.GET_AVAILABLE_MODELS),
     getDefaultConfig: () => ipcRenderer.invoke(IPC_CHANNELS.GET_DEFAULT_CONFIG),

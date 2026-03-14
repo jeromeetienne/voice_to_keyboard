@@ -5,6 +5,8 @@
 
 /**
  * @typedef {{
+ *   getTranscriptionHistory: () => Promise<TranscriptionEntry[]>,
+ *   onHistoryUpdated: (callback: (entries: TranscriptionEntry[]) => void) => void
  *   getConfig: () => Promise<AppConfig>,
  *   saveConfig: (config: AppConfig) => Promise<void>,
  *   getAvailableLanguages: () => Promise<string[]>,
