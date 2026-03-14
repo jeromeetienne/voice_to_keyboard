@@ -9,6 +9,7 @@ import { TranscriptionWhisper } from '../libs/transcription_whisper';
 import { GlobalShortcut, GlobalShortcutCallback } from '../libs/global_shortcut';
 import { MicRecorder } from '../libs/mic_recorder';
 import { KeyboardTyper } from '../libs/keyboard_typer';
+import { AppConfigManager, AppConfig } from '../libs/app_config';
 
 export type AppState = 'idle' | 'recording' | 'processing';
 
@@ -21,7 +22,7 @@ export type AppState = 'idle' | 'recording' | 'processing';
 export type Voice2KeyAppCallback = (appState: AppState, transcribedText?: string) => Promise<void>;
 
 export class Voice2KeyApp {
-	static async main(onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
+	static async main(appConfig: AppConfig, onStateChange: Voice2KeyAppCallback = async (appState) => { }) {
 		const verbose = true
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -34,7 +35,7 @@ export class Voice2KeyApp {
 		const whisperPath = Path.resolve(__dirname, '../../outputs/whisper.cpp');
 		await TranscriptionWhisper.installIfNeeded(whisperPath, {
 			verbose: verbose,
-			modelName: 'medium.en',
+			modelName: appConfig.transcriptionModel,
 		});
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -109,7 +110,7 @@ export class Voice2KeyApp {
 				console.log('Transcribing audio with whisper.cpp...');
 				const transcriptionText = await TranscriptionWhisper.transcribe(whisperPath, soundPath, {
 					verbose: verbose,
-					language: 'en',
+					language: appConfig.transcriptionLanguage,
 				});
 
 				// Delete the temporary audio file
@@ -147,9 +148,14 @@ export class Voice2KeyApp {
 ///////////////////////////////////////////////////////////////////////////////
 
 if (require.main === module) {
-	Voice2KeyApp.main(async (appState) => {
-		console.log(`App state changed to ${appState}`);
-	}).catch((err) => {
+	(async () => {
+		const configManager = new AppConfigManager();
+		const config = configManager.load() ?? AppConfigManager.getDefaultConfig();
+
+		await Voice2KeyApp.main(config, async (appState) => {
+			console.log(`App state changed to ${appState}`);
+		});
+	})().catch((err) => {
 		console.error(err);
 		process.exit(1);
 	});

@@ -7,6 +7,7 @@ import Electron from "electron";
 import { Voice2KeyApp, Voice2KeyAppCallback } from '../app/voice2key_app';
 import { GlobalShortcut } from '../libs/global_shortcut';
 import { AppState } from '../app/voice2key_app';
+import { AppConfig } from '../libs/app_config';
 
 const IPC_CHANNELS = {
 	SHOW_ABOUT: 'show-about',
@@ -150,7 +151,7 @@ class HistoryWindowHelper {
 }
 
 export class ElectronMain {
-	static async main() {
+	static async main(appConfig: AppConfig) {
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 		//
@@ -281,6 +282,7 @@ export class ElectronMain {
 			let lastAppState: AppState | null = null; // keep track of the last app state to avoid showing duplicate notifications
 
 			async function onAppStateIdle(transcribedText?: string) {
+				console.info(`[Voice2KeyAppCallback] App state changed to idle. Transcribed text: ${transcribedText ?? 'N/A'}`);
 				trayMenu.setImage(imageNativeIdle);
 				if (lastAppState === 'processing' && transcribedText) {
 					new Electron.Notification({
@@ -296,6 +298,7 @@ export class ElectronMain {
 			}
 
 			async function onAppStateRecording() {
+				console.info(`[Voice2KeyAppCallback] App state changed to recording.`);
 				trayMenu.setImage(imageNativeRecording);
 				new Electron.Notification({
 					title: "Voice to Keyboard",
@@ -304,6 +307,7 @@ export class ElectronMain {
 			}
 
 			async function onAppStateProcessing() {
+				console.info(`[Voice2KeyAppCallback] App state changed to processing.`);
 				trayMenu.setImage(imageNativeProcessing);
 				new Electron.Notification({
 					title: "Voice to Keyboard",
@@ -343,7 +347,7 @@ export class ElectronMain {
 			///////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////
 
-			await Voice2KeyApp.main(appCallback);
+			await Voice2KeyApp.main(appConfig, appCallback);
 		});
 
 	}

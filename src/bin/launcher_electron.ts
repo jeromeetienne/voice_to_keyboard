@@ -1,8 +1,14 @@
 import { ElectronMain } from "../electron/electron_main";
+import { AppConfigManager } from '../libs/app_config';
 
 
 async function main() {
-	await ElectronMain.main();
+	// load the app configuration
+	const appConfigManager = new AppConfigManager();
+	const appConfig = appConfigManager.load() ?? AppConfigManager.getDefaultConfig();
+
+	// run the app
+	await ElectronMain.main(appConfig);
 }
 
 main().catch((err) => {
