@@ -122,7 +122,7 @@ class ConfigWindowHelper {
 			height: 600,
 			title: 'Voice to Keyboard Configuration',
 			webPreferences: {
-				preload: Path.join(__dirname, 'launcher_electron_preload.js'),
+				preload: Path.join(__dirname, 'preload.js'),
 				nodeIntegration: false,
 				contextIsolation: true,
 			},
@@ -256,7 +256,7 @@ class HistoryWindowHelper {
 			height: 600,
 			title: 'Transcription History',
 			webPreferences: {
-				preload: Path.join(__dirname, 'launcher_electron_preload.js'),
+				preload: Path.join(__dirname, 'preload.js'),
 				nodeIntegration: false,
 				contextIsolation: true,
 			},
@@ -304,7 +304,7 @@ export class ElectronMain {
 			dummyWindow = new Electron.BrowserWindow({
 				show: false,
 				webPreferences: {
-					preload: Path.join(__dirname, 'launcher_electron_preload.js'),
+					preload: Path.join(__dirname, 'preload.js'),
 					nodeIntegration: false,
 					contextIsolation: true
 				}

@@ -2,6 +2,7 @@
  * @typedef {{ transcriptionLanguage: string, transcriptionModel: string }} AppConfig
  */
 
+
 /**
  * @typedef {{
  *   getConfig: () => Promise<AppConfig>,
