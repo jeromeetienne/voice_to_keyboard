@@ -382,7 +382,7 @@ export class ElectronMain {
 					click: async () => { await ConfigWindowHelper.openConfigWindow(); },
 				},
 				{
-					label: 'Show Transcription History',
+					label: 'History',
 					click: async () => { await HistoryWindowHelper.openHistoryWindow(); },
 				},
 				{
@@ -394,7 +394,7 @@ export class ElectronMain {
 					click: () => Electron.shell.openExternal("https://github.com/jeromeetienne/voice_to_keyboard#readme")
 				},
 				{ type: "separator" },
-				{ role: "quit", label: "Quit VoiceToKeyboard" }
+				{ role: "quit", label: "Quit" }
 			]);
 			trayMenu.setContextMenu(dropDownMenu);
 			trayMenu.setToolTip("Voice to Keyboard");

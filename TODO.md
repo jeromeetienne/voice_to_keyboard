@@ -1,3 +1,11 @@
+- support npx... good if you keep it opensource
+- make it installable
+- make it cross plateform
+- add icons
+
+
+---
+## DONE List
 - DONE Update CSS as little as possible in the public pages.
 - DONE When the configuration changes, relaunch the whole application.
 - DONE provide a configuration page 
