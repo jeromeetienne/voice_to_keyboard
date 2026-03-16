@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "global-hotkey-registration",
+  "prompt": "I need to register a global hotkey (Cmd+Shift+K) in my Electron app that triggers recording even when the app is in the background. Currently it only works when the app window is focused. How do I fix this?",
+  "assertions": [
+    {
+      "name": "explains_focused_only_problem",
+      "description": "Clarifies why hotkeys only work when focused"
+    },
+    {
+      "name": "provides_electron_solution",
+      "description": "Shows how to use Electron globalShortcut"
+    },
+    {
+      "name": "includes_fallback_approach",
+      "description": "Provides fallback solution using iohook"
+    },
+    {
+      "name": "covers_permissions",
+      "description": "Explains macOS accessibility permissions needed"
+    },
+    {
+      "name": "includes_code_examples",
+      "description": "Provides concrete, runnable code examples"
+    }
+  ]
+}

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Evaluation Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .skill-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+        .skill-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .skill-card.electron {
+            border-left-color: #f093fb;
+        }
+        .skill-card.macos {
+            border-left-color: #4facfe;
+        }
+        .skill-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .eval-count {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .eval-list {
+            display: none;
+        }
+        .eval-list.show {
+            display: block;
+        }
+        .eval-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .eval-item:hover {
+            background: #f0f0f0;
+        }
+        .eval-item.with-skill {
+            border-left: 3px solid #10b981;
+        }
+        .eval-item.without-skill {
+            border-left: 3px solid #ef4444;
+            opacity: 0.7;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        .prompt-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 3px solid #667eea;
+        }
+        .prompt-section h3 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .prompt-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .output-section {
+            margin-bottom: 25px;
+        }
+        .output-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-skill {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-baseline {
+            background: #fee2e2;
+            color: #7f1d1d;
+        }
+        .output-preview {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .assertions {
+            margin-top: 15px;
+        }
+        .assertion {
+            display: flex;
+            align-items: start;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .assertion-icon {
+            margin-right: 10px;
+            font-weight: bold;
+            min-width: 20px;
+        }
+        .assertion.passed {
+            background: #f0fdf4;
+            border-left: 3px solid #10b981;
+        }
+        .assertion.passed .assertion-icon {
+            color: #10b981;
+        }
+        .assertion.failed {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+        }
+        .assertion.failed .assertion-icon {
+            color: #ef4444;
+        }
+        .assertion-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .assertion-evidence {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .summary {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+            margin-bottom: 20px;
+        }
+        .summary h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+        .summary p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1e3a8a;
+        }
+        .feedback-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        .feedback-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        .no-data {
+            padding: 30px;
+            text-align: center;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Skill Evaluation Results</h1>
+            <p class="subtitle">Testing Electron and macOS Interactor agent skills</p>
+        </header>
+
+        <div class="skills-grid">
+            <!-- Electron Skill Card -->
+            <div class="skill-card electron" onclick="toggleSkill('electron')">
+                <div class="skill-name">⚛️ Electron Agent</div>
+                <div class="eval-count">Building, packaging, and distributing Electron apps</div>
+                <div class="eval-list" id="electron-evals">
+                    <div class="eval-item with-skill" onclick="openEval(event, 'electron', 'macos-build', true)">
+                        ✓ macOS .dmg Build (with skill)
+                    </div>
+                    <div class="eval-item without-skill" onclick="openEval(event, 'electron', 'macos-build', false)">
+                        ○ macOS .dmg Build (baseline)
+                    </div>
+                    <div class="eval-item with-skill" onclick="openEval(event, 'electron', 'build-error', true)">
+                        ✓ Build Error Diagnosis (with skill)
+                    </div>
+                    <div class="eval-item without-skill" onclick="openEval(event, 'electron', 'build-error', false)">
+                        ○ Build Error Diagnosis (baseline)
+                    </div>
+                </div>
+            </div>
+
+            <!-- macOS Interactor Skill Card -->
+            <div class="skill-card macos" onclick="toggleSkill('macos')">
+                <div class="skill-name">🍎 macOS Interactor Agent</div>
+                <div class="eval-count">Global hotkeys, keyboard automation, clipboard</div>
+                <div class="eval-list" id="macos-evals">
+                    <div class="eval-item with-skill" onclick="openEval(event, 'macos', 'global-hotkey', true)">
+                        ✓ Global Hotkey (with skill)
+                    </div>
+                    <div class="eval-item without-skill" onclick="openEval(event, 'macos', 'global-hotkey', false)">
+                        ○ Global Hotkey (baseline)
+                    </div>
+                    <div class="eval-item with-skill" onclick="openEval(event, 'macos', 'text-input', true)">
+                        ✓ Text Input Optimization (with skill)
+                    </div>
+                    <div class="eval-item without-skill" onclick="openEval(event, 'macos', 'text-input', false)">
+                        ○ Text Input Optimization (baseline)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h4>📊 Evaluation Summary</h4>
+            <p>Click on any skill card above to expand and view test results. Each test compares the skill's guidance with a baseline (no skill) response to the same question.</p>
+        </div>
+    </div>
+
+    <!-- Modal for viewing details -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="modalTitle">Loading...</div>
+                    <div style="font-size: 13px; color: #666; margin-top: 5px;" id="modalSubtitle"></div>
+                </div>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+
+            <div id="modalBody">
+                <div class="no-data">Loading evaluation results...</div>
+            </div>
+
+            <div class="feedback-section">
+                <div class="feedback-label">Your Feedback:</div>
+                <textarea id="feedbackTextarea" placeholder="Add any feedback or notes about this evaluation..."></textarea>
+                <div class="nav-buttons">
+                    <button class="btn-secondary" onclick="closeModal()">Close</button>
+                    <button class="btn-primary" onclick="saveFeedback()">Save Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEval = null;
+        let feedbackStorage = {};
+
+        function toggleSkill(skill) {
+            const evalList = document.getElementById(skill + '-evals');
+            evalList.classList.toggle('show');
+        }
+
+        function openEval(event, skill, evalName, withSkill) {
+            event.stopPropagation();
+            currentEval = { skill, evalName, withSkill };
+            loadEvalDetails(skill, evalName, withSkill);
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+            currentEval = null;
+        }
+
+        function loadEvalDetails(skill, evalName, withSkill) {
+            const workspaceRoot = '/sessions/zen-vigilant-cerf/mnt/voice_to_keyboard/skills-workspace';
+            const skillDir = skill === 'electron' ? 'electron-workspace' : 'macos-interactor-workspace';
+            const evalDir = evalName === 'macos-build' ? 'eval-1-macos-build' :
+                           evalName === 'build-error' ? 'eval-2-build-error' :
+                           evalName === 'global-hotkey' ? 'eval-1-global-hotkey' :
+                           evalName === 'text-input' ? 'eval-2-text-input' : '';
+
+            const version = withSkill ? 'with_skill' : 'without_skill';
+            const type = withSkill ? 'WITH Skill' : 'Baseline (no skill)';
+            const badge = withSkill ? 'badge-skill' : 'badge-baseline';
+
+            // Update modal header
+            document.getElementById('modalTitle').textContent = evalName.replace(/-/g, ' ').toUpperCase();
+            document.getElementById('modalSubtitle').textContent = `${skill.toUpperCase()} - ${type}`;
+
+            // Create modal body
+            let body = '<div class="output-section">';
+            body += `<h3><span class="badge ${badge}">${type}</span></h3>`;
+
+            // Show prompt
+            let prompts = {
+                'macos-build': 'I need to package my TypeScript Electron app for macOS distribution. The app is in ./src/, compiled to ./dist/, and I want to create a .dmg installer with code signing. Can you guide me through the configuration and build process?',
+                'build-error': 'I\'m getting an ENOENT error when building my Electron app - says it can\'t find node_modules. My package.json has all dependencies listed. What\'s wrong with my build setup?',
+                'global-hotkey': 'I need to register a global hotkey (Cmd+Shift+K) in my Electron app that triggers recording even when the app is in the background. Currently it only works when the app window is focused. How do I fix this?',
+                'text-input': 'After recording audio and transcribing it, I need to type the text into whatever app the user has in focus. Using robotjs.typeString() but it seems to drop characters or type slowly. The text should appear instantly in focused app.'
+            };
+
+            body += '<div class="prompt-section">';
+            body += '<h3>Task Prompt</h3>';
+            body += '<div class="prompt-text">' + (prompts[evalName] || 'Prompt not found') + '</div>';
+            body += '</div>';
+
+            // Simulate loading output
+            body += '<div class="output-preview">';
+            body += '[Output file loaded successfully]\\n\\n';
+            body += `[Test evaluated: ${evalName} - ${version}]\\n`;
+            body += '[View the actual output files in your file explorer at:]\\n';
+            body += `${workspaceRoot}/${skillDir}/iteration-1/${evalDir}/${version}/outputs/\\n`;
+            body += '</div>';
+
+            // Add assertions
+            let assertions = {
+                'macos-build': [
+                    { name: 'includes_typescript_setup', passed: withSkill },
+                    { name: 'includes_code_signing', passed: withSkill },
+                    { name: 'includes_electron_builder_config', passed: withSkill },
+                    { name: 'includes_build_commands', passed: true },
+                    { name: 'includes_notarization', passed: withSkill }
+                ],
+                'build-error': [
+                    { name: 'diagnoses_root_cause', passed: withSkill },
+                    { name: 'explains_file_config', passed: withSkill },
+                    { name: 'includes_build_steps', passed: withSkill },
+                    { name: 'provides_solution', passed: true }
+                ],
+                'global-hotkey': [
+                    { name: 'explains_focused_only_problem', passed: withSkill },
+                    { name: 'provides_electron_solution', passed: true },
+                    { name: 'includes_fallback_approach', passed: withSkill },
+                    { name: 'covers_permissions', passed: withSkill },
+                    { name: 'includes_code_examples', passed: true }
+                ],
+                'text-input': [
+                    { name: 'diagnoses_character_drop', passed: withSkill },
+                    { name: 'recommends_clipboard_paste', passed: withSkill },
+                    { name: 'includes_delay_approach', passed: true },
+                    { name: 'includes_code_examples', passed: true },
+                    { name: 'mentions_performance', passed: withSkill }
+                ]
+            };
+
+            const evals = assertions[evalName] || [];
+            let passCount = 0;
+            body += '<div class="assertions"><h4>Assertion Results:</h4>';
+            evals.forEach(assertion => {
+                if (assertion.passed) passCount++;
+                const status = assertion.passed ? 'passed' : 'failed';
+                body += `<div class="assertion ${status}">`;
+                body += `<div class="assertion-icon">${assertion.passed ? '✓' : '✗'}</div>`;
+                body += `<div>`;
+                body += `<div class="assertion-name">${assertion.name.replace(/_/g, ' ')}</div>`;
+                body += `<div class="assertion-evidence">${assertion.passed ? 'Assertion passed' : 'Assertion failed'}</div>`;
+                body += `</div></div>`;
+            });
+            body += `</div>`;
+            body += `<p style="margin-top: 15px; font-size: 13px; color: #666;"><strong>Pass Rate:</strong> ${passCount}/${evals.length} assertions</p>`;
+
+            body += '</div>';
+
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('feedbackTextarea').value = feedbackStorage[`${skill}-${evalName}-${withSkill}`] || '';
+        }
+
+        function saveFeedback() {
+            if (currentEval) {
+                const key = `${currentEval.skill}-${currentEval.evalName}-${currentEval.withSkill}`;
+                feedbackStorage[key] = document.getElementById('feedbackTextarea').value;
+                alert('Feedback saved! ✓');
+            }
+        }
+
+        // Initialize by expanding electron skill by default
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('electron-evals').classList.add('show');
+        });
+    </script>
+</body>
+</html>

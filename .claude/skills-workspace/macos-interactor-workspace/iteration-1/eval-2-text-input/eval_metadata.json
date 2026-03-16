@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "text-input-optimization",
+  "prompt": "After recording audio and transcribing it, I need to type the text into whatever app the user has in focus. Using robotjs.typeString() but it seems to drop characters or type slowly. The text should appear instantly in focused app.",
+  "assertions": [
+    {
+      "name": "diagnoses_character_drop",
+      "description": "Explains why robotjs drops characters"
+    },
+    {
+      "name": "recommends_clipboard_paste",
+      "description": "Suggests clipboard + paste as optimal solution"
+    },
+    {
+      "name": "includes_delay_approach",
+      "description": "Provides fallback with optimized delays"
+    },
+    {
+      "name": "includes_code_examples",
+      "description": "Provides production-ready code examples"
+    },
+    {
+      "name": "mentions_performance",
+      "description": "Discusses performance and reliability tradeoffs"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "skill_name": "electron",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to package my TypeScript Electron app for macOS distribution. The app is in ./src/, compiled to ./dist/, and I want to create a .dmg installer with code signing. Can you guide me through the configuration and build process?",
+      "expected_output": "Step-by-step guide including: package.json electron-builder config, build commands, code signing setup with certificates, and verification steps"
+    },
+    {
+      "id": 2,
+      "prompt": "I'm getting an ENOENT error when building my Electron app - says it can't find node_modules. My package.json has all dependencies listed. What's wrong with my build setup?",
+      "expected_output": "Diagnosis and solution covering: proper file list config in electron-builder, pre-build steps (tsc/tsx), dist vs source folder organization, common misconfigurations"
+    },
+    {
+      "id": 3,
+      "prompt": "I want to build and distribute my Electron app for macOS (Intel and Apple Silicon), Windows (exe), and Linux (AppImage). Can you create a multi-platform build config?",
+      "expected_output": "Complete electron-builder config example with platform-specific targets, universal binary settings, and build command recommendations"
+    }
+  ]
+}
