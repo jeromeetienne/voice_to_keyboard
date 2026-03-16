@@ -8,6 +8,7 @@ import { Voice2KbdApp, Voice2KbdAppCallback } from '../app/voice2key_app';
 import { GlobalShortcut } from '../libs/global_shortcut';
 import { AppState } from '../app/voice2key_app';
 import { AppConfig, AppConfigManager } from '../libs/app_config';
+import { TranscriptionHistoryManager, TranscriptionHistoryEntry } from '../libs/transcription_history';
 
 const IPC_CHANNELS = {
 	SHOW_ABOUT: 'show-about',
@@ -23,11 +24,6 @@ const IPC_CHANNELS = {
 
 const IPC_LOG_PREFIX = '[voice2key][ipc]';
 const MAX_HISTORY_ENTRIES = 100;
-
-type TranscriptionHistoryEntry = {
-	text: string;
-	createdAt: string;
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,17 +248,26 @@ class ElectronAppHelper {
 ///////////////////////////////////////////////////////////////////////////////
 
 class HistoryWindowHelper {
-	// In-memory transcription history (newest first)
-	private static transcriptionHistory: TranscriptionHistoryEntry[] = [];
+	// Transcription history manager (handles file persistence)
+	private static historyManager: TranscriptionHistoryManager | null = null;
 	private static historyWindow: Electron.BrowserWindow | null = null;
 
-	static appendTranscriptionToHistory(text: string): void {
-		HistoryWindowHelper.transcriptionHistory.unshift({ text, createdAt: new Date().toISOString() });
-		if (HistoryWindowHelper.transcriptionHistory.length > MAX_HISTORY_ENTRIES) {
-			HistoryWindowHelper.transcriptionHistory.length = MAX_HISTORY_ENTRIES;
+	static setHistoryManager(manager: TranscriptionHistoryManager): void {
+		HistoryWindowHelper.historyManager = manager;
+	}
+
+	static async appendTranscriptionToHistory(text: string): Promise<void> {
+		if (!HistoryWindowHelper.historyManager) {
+			console.error('[HistoryWindowHelper] History manager not initialized');
+			return;
 		}
+
+		await HistoryWindowHelper.historyManager.append(text);
+
+		// Notify the history window if it's open
 		if (HistoryWindowHelper.historyWindow && !HistoryWindowHelper.historyWindow.isDestroyed()) {
-			HistoryWindowHelper.historyWindow.webContents.send(IPC_CHANNELS.HISTORY_UPDATED, [...HistoryWindowHelper.transcriptionHistory]);
+			const updatedHistory = HistoryWindowHelper.historyManager.getAll();
+			HistoryWindowHelper.historyWindow.webContents.send(IPC_CHANNELS.HISTORY_UPDATED, updatedHistory);
 		}
 	}
 
@@ -287,7 +292,10 @@ class HistoryWindowHelper {
 	}
 
 	static getHistory(): TranscriptionHistoryEntry[] {
-		return [...HistoryWindowHelper.transcriptionHistory];
+		if (!HistoryWindowHelper.historyManager) {
+			return [];
+		}
+		return HistoryWindowHelper.historyManager.getAll();
 	}
 }
 
@@ -477,7 +485,7 @@ export class ElectronMain {
 				if (appState === 'idle') {
 					await onAppStateIdle(transcribedText);
 					if (lastAppState === 'processing' && transcribedText) {
-						HistoryWindowHelper.appendTranscriptionToHistory(transcribedText);
+						await HistoryWindowHelper.appendTranscriptionToHistory(transcribedText);
 					}
 				} else if (appState === 'recording') {
 					await onAppStateRecording();
@@ -501,6 +509,18 @@ export class ElectronMain {
 			const appConfigManager = new AppConfigManager();
 			ConfigWindowHelper.setAppConfigManager(appConfigManager);
 			ConfigWindowHelper.setCurrentConfig(appConfig);
+
+			///////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////
+			//	Initialize Transcription History Manager
+			///////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////
+
+			const projectRoot = Path.join(__dirname, '../../');
+			const historyManager = new TranscriptionHistoryManager(MAX_HISTORY_ENTRIES, projectRoot);
+			await historyManager.load();
+			HistoryWindowHelper.setHistoryManager(historyManager);
+			console.info(`[ElectronMain] Transcription history loaded from: ${historyManager.getFilePath()}`);
 
 			///////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////

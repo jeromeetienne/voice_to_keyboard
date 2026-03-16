@@ -4,6 +4,9 @@ node_modules/
 # ignore .env file
 .env
 
+# ignore the transcription history file
+.transcription_history.json
+
 # ignore MacOS system files
 .DS_Store
 
