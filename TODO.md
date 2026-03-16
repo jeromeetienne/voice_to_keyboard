@@ -1,4 +1,3 @@
-- store the history in a file.... thus if i relaunch the app, i can see the history of the transcribed text
 - support npx... good if you keep it opensource
 - make it installable
 - make it cross plateform
@@ -7,6 +6,7 @@
 
 ---
 ## DONE List
+- DONE store the history in a file.... thus if i relaunch the app, i can see the history of the transcribed text
 - DONE Update CSS as little as possible in the public pages.
 - DONE When the configuration changes, relaunch the whole application.
 - DONE provide a configuration page 
