@@ -49,6 +49,8 @@ class AboutDialogHelper {
 	static async showAboutDialog(): Promise<void> {
 		console.info(`${IPC_LOG_PREFIX} showAboutDialog requested`);
 		const detailContent = [
+			`By Jérôme Etienne`,
+			``,
 			`Version: ${await AboutDialogHelper.getVoiceToKeyboardVersion()}`,
 			`Electron: ${process.versions.electron}`,
 			`Node: ${process.versions.node}`
