@@ -1,3 +1,4 @@
+- store the history in a file.... thus if i relaunch the app, i can see the history of the transcribed text
 - support npx... good if you keep it opensource
 - make it installable
 - make it cross plateform
