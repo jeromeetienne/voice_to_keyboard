@@ -1,3 +1,12 @@
+- it never work in french... how come
+  - maybe i dont the configuration into account
+  - e.g.
+    1. change the default language to french and model to large-v1 
+    2. remove the whisper-cpp folder
+    3. relaunch and let it load the large model
+    4. test if it works in french
+    5. !??!? and first thing it load the 'medium.en' default model
+    6. hint the config is ignored
 - support npx... good if you keep it opensource
 - make it installable
 - make it cross plateform
