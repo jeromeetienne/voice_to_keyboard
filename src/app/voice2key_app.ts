@@ -110,6 +110,7 @@ export class Voice2KbdApp {
 				console.log('Transcribing audio with whisper.cpp...');
 				const transcriptionText = await TranscriptionWhisper.transcribe(whisperPath, soundPath, {
 					verbose: verbose,
+					modelName: appConfig.transcriptionModel,
 					language: appConfig.transcriptionLanguage,
 				});
 
