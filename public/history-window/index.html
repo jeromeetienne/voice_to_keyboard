@@ -21,8 +21,10 @@
 			<!-- Sidebar: History list (25% width) -->
 			<aside class="col-3 border-end d-flex flex-column overflow-hidden mh-100">
 				<div
-					class="flex-shrink-0 px-3 py-2 border-bottom text-uppercase text-muted fw-bold small">
-					History</div>
+					class="flex-shrink-0 px-3 py-2 border-bottom text-uppercase text-muted fw-bold small d-flex justify-content-between align-items-center">
+					<span>History</span>
+					<button id="clearBtn" type="button" class="btn btn-outline-danger btn-sm py-0 px-1" style="font-size: 0.7rem;">Clear</button>
+				</div>
 				<!-- Scrollable list of transcription entries -->
 				<ul id="historyList" class="list-group list-group-flush overflow-y-auto flex-fill mb-0">
 				</ul>

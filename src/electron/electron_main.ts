@@ -20,6 +20,7 @@ const IPC_CHANNELS = {
 	GET_AVAILABLE_LANGUAGES: 'get-available-languages',
 	GET_AVAILABLE_MODELS: 'get-available-models',
 	GET_DEFAULT_CONFIG: 'get-default-config',
+	CLEAR_HISTORY: 'clear-history',
 } as const;
 
 const IPC_LOG_PREFIX = '[voice2key][ipc]';
@@ -240,6 +241,12 @@ class ElectronAppHelper {
 			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.GET_DEFAULT_CONFIG}`);
 			return ConfigWindowHelper.getDefaultConfig();
 		});
+
+		Electron.ipcMain.removeHandler(IPC_CHANNELS.CLEAR_HISTORY);
+		Electron.ipcMain.handle(IPC_CHANNELS.CLEAR_HISTORY, () => {
+			console.info(`${IPC_LOG_PREFIX} ipcMain.handle invoked for ${IPC_CHANNELS.CLEAR_HISTORY}`);
+			return HistoryWindowHelper.clearHistory();
+		});
 	}
 }
 
@@ -298,6 +305,19 @@ class HistoryWindowHelper {
 			return [];
 		}
 		return HistoryWindowHelper.historyManager.getAll();
+	}
+
+	static async clearHistory(): Promise<void> {
+		if (!HistoryWindowHelper.historyManager) {
+			console.error('[HistoryWindowHelper] History manager not initialized');
+			return;
+		}
+		await HistoryWindowHelper.historyManager.clear();
+
+		// Notify the history window if it's open
+		if (HistoryWindowHelper.historyWindow && !HistoryWindowHelper.historyWindow.isDestroyed()) {
+			HistoryWindowHelper.historyWindow.webContents.send(IPC_CHANNELS.HISTORY_UPDATED, []);
+		}
 	}
 }
 

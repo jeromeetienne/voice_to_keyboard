@@ -10,6 +10,7 @@ const IPC_CHANNELS = {
     GET_AVAILABLE_LANGUAGES: 'get-available-languages',
     GET_AVAILABLE_MODELS: 'get-available-models',
     GET_DEFAULT_CONFIG: 'get-default-config',
+    CLEAR_HISTORY: 'clear-history',
 };
 
 ipcRenderer.on(IPC_CHANNELS.MENU_ABOUT_CLICKED, () => {
@@ -33,4 +34,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getAvailableLanguages: () => ipcRenderer.invoke(IPC_CHANNELS.GET_AVAILABLE_LANGUAGES),
     getAvailableModels: () => ipcRenderer.invoke(IPC_CHANNELS.GET_AVAILABLE_MODELS),
     getDefaultConfig: () => ipcRenderer.invoke(IPC_CHANNELS.GET_DEFAULT_CONFIG),
+    clearHistory: () => ipcRenderer.invoke(IPC_CHANNELS.CLEAR_HISTORY),
 });

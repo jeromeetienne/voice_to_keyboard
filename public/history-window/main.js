@@ -120,6 +120,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    const clearBtn = /** @type {HTMLButtonElement} */ (document.querySelector('#clearBtn'));
+    clearBtn.addEventListener('click', async () => {
+        if (typeof electronAPI.clearHistory === 'function') {
+            await electronAPI.clearHistory();
+            historyEntries = [];
+            selectedIndex = -1;
+            populateList([]);
+        }
+    });
+
     if (typeof electronAPI.onHistoryUpdated === 'function') {
         electronAPI.onHistoryUpdated((/** @type {TranscriptionEntry[]} */ entries) => {
             historyEntries = entries;
