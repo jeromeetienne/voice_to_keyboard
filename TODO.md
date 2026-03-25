@@ -1,4 +1,13 @@
-- it never work in french... how come
+- add icons better icons, especially color in the tray
+- see bugs in `docs/diagnosis-src-issues.md`
+- support npx... good if you keep it opensource
+- make it installable
+- make it cross plateform
+
+
+---
+## DONE List
+- DONE it never work in french... how come
   - maybe i dont the configuration into account
   - e.g.
     1. change the default language to french and model to large-v1 
@@ -7,14 +16,6 @@
     4. test if it works in french
     5. !??!? and first thing it load the 'medium.en' default model
     6. hint the config is ignored
-- support npx... good if you keep it opensource
-- make it installable
-- make it cross plateform
-- add icons
-
-
----
-## DONE List
 - DONE store the history in a file.... thus if i relaunch the app, i can see the history of the transcribed text
 - DONE Update CSS as little as possible in the public pages.
 - DONE When the configuration changes, relaunch the whole application.
