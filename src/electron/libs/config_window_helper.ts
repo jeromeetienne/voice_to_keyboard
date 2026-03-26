@@ -3,6 +3,7 @@ import Path from 'node:path';
 import Electron from 'electron';
 import { AppConfig, AppConfigManager } from '../../libs/app_config';
 import { IPC_LOG_PREFIX } from './ipc_channels';
+import { ProjectPath } from './project_path';
 
 export class ConfigWindowHelper {
 	// Configuration window instance
@@ -39,13 +40,13 @@ export class ConfigWindowHelper {
 			height: 600,
 			title: 'Voice to Keyboard Configuration',
 			webPreferences: {
-				preload: Path.join(__dirname, 'preload.js'),
+				preload: ProjectPath.PRELOAD_JS,
 				nodeIntegration: false,
 				contextIsolation: true,
 			},
 		});
 		ConfigWindowHelper.configWindow.on('closed', () => { ConfigWindowHelper.configWindow = null; });
-		await ConfigWindowHelper.configWindow.loadFile(Path.join(__dirname, '../../public/config-window/index.html'));
+		await ConfigWindowHelper.configWindow.loadFile(Path.join(ProjectPath.ROOT, 'public/config-window/index.html'));
 	}
 
 	/**

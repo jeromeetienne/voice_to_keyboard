@@ -3,13 +3,14 @@ import Fs from 'node:fs';
 
 import Electron from 'electron';
 import { IPC_CHANNELS, IPC_LOG_PREFIX } from './ipc_channels';
+import { ProjectPath } from './project_path';
 
 export class AboutDialogHelper {
 	/**
 	 * Reads and returns the version of VoiceToKeyboard from package.json.
 	 */
 	static async getVoiceToKeyboardVersion(): Promise<string> {
-		const filePath = Path.join(__dirname, '../../package.json');
+		const filePath = Path.join(ProjectPath.ROOT, './package.json');
 		const fileContent = await Fs.promises.readFile(filePath, 'utf-8');
 		const packageJson = JSON.parse(fileContent);
 		return packageJson.version;
@@ -22,6 +23,8 @@ export class AboutDialogHelper {
 	static async showAboutDialog(): Promise<void> {
 		console.info(`${IPC_LOG_PREFIX} showAboutDialog requested`);
 		const detailContent = [
+			`It is a push to talk application that converts your voice into keyboard input, allowing you to control your computer using voice commands.`,
+			``,
 			`By Jérôme Etienne`,
 			``,
 			`Version: ${await AboutDialogHelper.getVoiceToKeyboardVersion()}`,

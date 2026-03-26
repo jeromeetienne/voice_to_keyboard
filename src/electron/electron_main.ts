@@ -13,6 +13,7 @@ import { AboutDialogHelper } from './libs/about_dialog_helper';
 import { ConfigWindowHelper } from './libs/config_window_helper';
 import { HistoryWindowHelper } from './libs/history_window_helper';
 import { ElectronAppHelper } from './libs/electron_app_helper';
+import { ProjectPath as ProjectPath } from './libs/project_path';
 
 const MAX_HISTORY_ENTRIES = 100;
 
@@ -56,7 +57,7 @@ export class ElectronMain {
 			dummyWindow = new Electron.BrowserWindow({
 				show: false,
 				webPreferences: {
-					preload: Path.join(__dirname, 'preload.js'),
+					preload: ProjectPath.PRELOAD_JS,
 					nodeIntegration: false,
 					contextIsolation: true
 				}
@@ -80,15 +81,15 @@ export class ElectronMain {
 
 			// Create all the tray icons we need upfront so that they're cached
 			// and show up instantly when we switch them in the tray
-			const imageIdlePath = Path.join(__dirname, "../../assets/images/icon-mic-fill-20x20.png");
+			const imageIdlePath = Path.join(ProjectPath.ROOT, "assets/images/icon-mic-fill-20x20.png");
 			const imageNativeIdle = Electron.nativeImage.createFromPath(imageIdlePath);
 			// set the idle icon as a template image so that it can adapt to light/dark themes and have proper transparency on macOS
 			imageNativeIdle.setTemplateImage(true);
 
-			const imageRecordingPath = Path.join(__dirname, "../../assets/images/icon-record-btn-fill-20x20.png");
+			const imageRecordingPath = Path.join(ProjectPath.ROOT, "assets/images/icon-record-btn-fill-20x20.png");
 			const imageNativeRecording = Electron.nativeImage.createFromPath(imageRecordingPath);
 
-			const imageProcessingPath = Path.join(__dirname, "../../assets/images/icon-soundwave-20x20.png");
+			const imageProcessingPath = Path.join(ProjectPath.ROOT, "assets/images/icon-soundwave-20x20.png");
 			const imageNativeProcessing = Electron.nativeImage.createFromPath(imageProcessingPath);
 
 
@@ -237,8 +238,7 @@ export class ElectronMain {
 			///////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////
 
-			const projectRoot = Path.join(__dirname, '../../');
-			const historyManager = new TranscriptionHistoryManager(MAX_HISTORY_ENTRIES, projectRoot);
+			const historyManager = new TranscriptionHistoryManager(MAX_HISTORY_ENTRIES, ProjectPath.ROOT);
 			await historyManager.load();
 			HistoryWindowHelper.setHistoryManager(historyManager);
 			console.info(`[ElectronMain] Transcription history loaded from: ${historyManager.getFilePath()}`);

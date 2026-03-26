@@ -3,6 +3,7 @@ import Path from 'node:path';
 import Electron from 'electron';
 import { TranscriptionHistoryManager, TranscriptionHistoryEntry } from '../../libs/transcription_history';
 import { IPC_CHANNELS } from './ipc_channels';
+import { ProjectPath } from './project_path';
 
 export class HistoryWindowHelper {
 	// Transcription history manager (handles file persistence)
@@ -38,13 +39,13 @@ export class HistoryWindowHelper {
 			height: 600,
 			title: 'Transcription History',
 			webPreferences: {
-				preload: Path.join(__dirname, 'preload.js'),
+				preload: ProjectPath.PRELOAD_JS,
 				nodeIntegration: false,
 				contextIsolation: true,
 			},
 		});
 		HistoryWindowHelper.historyWindow.on('closed', () => { HistoryWindowHelper.historyWindow = null; });
-		await HistoryWindowHelper.historyWindow.loadFile(Path.join(__dirname, '../../public/history-window/index.html'));
+		await HistoryWindowHelper.historyWindow.loadFile(Path.join(ProjectPath.ROOT, 'public/history-window/index.html'));
 		// HistoryWindowHelper.historyWindow.webContents.openDevTools();
 	}
 
