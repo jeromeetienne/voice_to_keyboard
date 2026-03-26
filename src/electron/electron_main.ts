@@ -81,20 +81,23 @@ export class ElectronMain {
 
 			// Create all the tray icons we need upfront so that they're cached
 			// and show up instantly when we switch them in the tray
-			const imageIdlePath = Path.join(ProjectPath.ROOT, "assets/images/icon-mic-fill-20x20.png");
-			const imageNativeIdle = Electron.nativeImage.createFromPath(imageIdlePath);
+			const imageIdlePath = Path.join(ProjectPath.ROOT, "assets/images/tray_icons/icon-mic-fill-20x20.png");
+			const imageIdleNative = Electron.nativeImage.createFromPath(imageIdlePath);
 			// set the idle icon as a template image so that it can adapt to light/dark themes and have proper transparency on macOS
-			imageNativeIdle.setTemplateImage(true);
+			imageIdleNative.setTemplateImage(true);
 
-			const imageRecordingPath = Path.join(ProjectPath.ROOT, "assets/images/icon-record-btn-fill-20x20.png");
-			const imageNativeRecording = Electron.nativeImage.createFromPath(imageRecordingPath);
+			const imageRecordingPath = Path.join(ProjectPath.ROOT, "assets/images/tray_icons/icon-record-btn-fill-20x20.png");
+			const imageRecordingNative = Electron.nativeImage.createFromPath(imageRecordingPath);
 
-			const imageProcessingPath = Path.join(ProjectPath.ROOT, "assets/images/icon-soundwave-20x20.png");
-			const imageNativeProcessing = Electron.nativeImage.createFromPath(imageProcessingPath);
-
+			const imageProcessingPath = Path.join(ProjectPath.ROOT, "assets/images/tray_icons/icon-soundwave-20x20.png");
+			const imageProcessingNative = Electron.nativeImage.createFromPath(imageProcessingPath);
 
 			// initialize the tray icon with the idle icon
-			const trayMenu = new Electron.Tray(imageNativeIdle);
+			const trayMenu = new Electron.Tray(imageIdleNative);
+
+			const imageDockPath = Path.join(ProjectPath.ROOT, "assets/images/dock_icons/icon-mic-fill-512x512.png");
+			const imageDockNative = Electron.nativeImage.createFromPath(imageDockPath);
+			Electron?.app?.dock?.setIcon(imageDockNative);
 
 			///////////////////////////////////////////////////////////////////////////////
 			///////////////////////////////////////////////////////////////////////////////
@@ -164,7 +167,7 @@ export class ElectronMain {
 
 			async function onAppStateIdle(transcribedText?: string) {
 				console.info(`[Voice2KbdAppCallback] App state changed to idle. Transcribed text: ${transcribedText ?? 'N/A'}`);
-				trayMenu.setImage(imageNativeIdle);
+				trayMenu.setImage(imageIdleNative);
 				if (lastAppState === 'processing' && transcribedText) {
 					new Electron.Notification({
 						title: "Voice to Keyboard",
@@ -180,7 +183,7 @@ export class ElectronMain {
 
 			async function onAppStateRecording() {
 				console.info(`[Voice2KbdAppCallback] App state changed to recording.`);
-				trayMenu.setImage(imageNativeRecording);
+				trayMenu.setImage(imageRecordingNative);
 				new Electron.Notification({
 					title: "Voice to Keyboard",
 					body: "Recording..."
@@ -189,7 +192,7 @@ export class ElectronMain {
 
 			async function onAppStateProcessing() {
 				console.info(`[Voice2KbdAppCallback] App state changed to processing.`);
-				trayMenu.setImage(imageNativeProcessing);
+				trayMenu.setImage(imageProcessingNative);
 				new Electron.Notification({
 					title: "Voice to Keyboard",
 					body: "Processing audio..."
