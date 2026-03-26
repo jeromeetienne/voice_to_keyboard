@@ -1,4 +1,8 @@
 - add icons better icons, especially color in the tray
+  - a red square during recording... animated ?
+  - a orange buzy wheel when processing the audio
+  - NOTE: yes it is possible to change the color of the icon
+    - is that possible to make it animated ?
 - see bugs in `docs/diagnosis-src-issues.md`
 - support npx... good if you keep it opensource
 - make it installable

@@ -385,12 +385,16 @@ export class ElectronMain {
 
 			// Create all the tray icons we need upfront so that they're cached 
 			// and show up instantly when we switch them in the tray
-			const imageNativeIdle = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-mic-20x20.png"));
+			const imageIdlePath = Path.join(__dirname, "../../assets/images/icon-mic-fill-20x20.png");
+			const imageNativeIdle = Electron.nativeImage.createFromPath(imageIdlePath);
+			// set the idle icon as a template image so that it can adapt to light/dark themes and have proper transparency on macOS
 			imageNativeIdle.setTemplateImage(true);
-			const imageNativeRecording = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-mic-fill-20x20.png"));
-			imageNativeRecording.setTemplateImage(true);
-			const imageNativeProcessing = Electron.nativeImage.createFromPath(Path.join(__dirname, "../../assets/images/icon-soundwave-20x20.png"));
-			imageNativeProcessing.setTemplateImage(true);
+
+			const imageRecordingPath = Path.join(__dirname, "../../assets/images/icon-record-btn-fill-20x20.png");
+			const imageNativeRecording = Electron.nativeImage.createFromPath(imageRecordingPath);
+
+			const imageProcessingPath = Path.join(__dirname, "../../assets/images/icon-soundwave-20x20.png");
+			const imageNativeProcessing = Electron.nativeImage.createFromPath(imageProcessingPath);
 
 
 			// initialize the tray icon with the idle icon
