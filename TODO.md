@@ -1,8 +1,5 @@
-- add icons better icons, especially color in the tray
-  - a red square during recording... animated ?
-  - a orange buzy wheel when processing the audio
-  - NOTE: yes it is possible to change the color of the icon
-    - is that possible to make it animated ?
+- BUG if key are released options or cmd first
+  - the key release is not detected
 - see bugs in `docs/diagnosis-src-issues.md`
 - support npx... good if you keep it opensource
 - make it installable
@@ -11,6 +8,11 @@
 
 ---
 ## DONE List
+- DONE add icons better icons, especially color in the tray
+  - a red square during recording... animated ?
+  - a orange buzy wheel when processing the audio
+  - NOTE: yes it is possible to change the color of the icon
+    - is that possible to make it animated ?
 - DONE it never work in french... how come
   - maybe i dont the configuration into account
   - e.g.

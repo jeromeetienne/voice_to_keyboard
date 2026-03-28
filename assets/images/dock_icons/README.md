@@ -1,0 +1,2 @@
+- bootstrap icon 'mic-fill' in black in 20x20
+  - https://jeromeetienne.github.io/bootstrap_icons_to_png/
