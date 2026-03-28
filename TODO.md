@@ -1,6 +1,5 @@
-- BUG if key are released options or cmd first
-  - the key release is not detected
 - see bugs in `docs/diagnosis-src-issues.md`
+  - this is a list of bugs according to AI
 - support npx... good if you keep it opensource
 - make it installable
 - make it cross plateform
@@ -8,6 +7,8 @@
 
 ---
 ## DONE List
+- DONE BUG if key are released options or cmd first
+  - the key release is not detected
 - DONE add icons better icons, especially color in the tray
   - a red square during recording... animated ?
   - a orange buzy wheel when processing the audio

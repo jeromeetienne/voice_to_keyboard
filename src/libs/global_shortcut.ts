@@ -33,7 +33,7 @@ export class GlobalShortcut {
 			// GlobalShortcut.displayEventData(eventData)
 
 			// if not the proper key, return now
-			const isPushToTalkKey = this.isPushToTalkKey(eventData)
+			const isPushToTalkKey = this.isPushToTalkKey(eventData, 'keyDown')
 			if (isPushToTalkKey === false) return
 
 			// if already running, return now
@@ -49,7 +49,7 @@ export class GlobalShortcut {
 		})
 		iohook.addListener('keyUp', (eventData: EventData) => {
 			// if not the proper key, return now
-			const isPushToTalkKey = this.isPushToTalkKey(eventData)
+			const isPushToTalkKey = this.isPushToTalkKey(eventData, 'keyUp')
 			if (isPushToTalkKey === false) return
 
 			// if not running, return now
@@ -76,17 +76,19 @@ export class GlobalShortcut {
 		iohook.stopMonitoring();
 	}
 
-	isPushToTalkKey(eventData: EventData): boolean {
+	isPushToTalkKey(eventData: EventData, eventType: 'keyDown' | 'keyUp'): boolean {
 		// key code 7 is the 'X' key
 		// key code 30 is the ']' key
 		if (eventData.keyCode !== 30) return false
 
-		if (eventData.modifiers.shift !== false) return false
-		if (eventData.modifiers.control !== false) return false
-		if (eventData.modifiers.option !== true) return false
-		if (eventData.modifiers.command !== true) return false
-		if (eventData.modifiers.capsLock !== false) return false
-		if (eventData.modifiers.fn !== false) return false
+		if (eventType === 'keyDown') {
+			if (eventData.modifiers.shift !== false) return false
+			if (eventData.modifiers.control !== false) return false
+			if (eventData.modifiers.option !== true) return false
+			if (eventData.modifiers.command !== true) return false
+			if (eventData.modifiers.capsLock !== false) return false
+			if (eventData.modifiers.fn !== false) return false
+		}
 		// if all checks passed, return true
 		return true
 	}
